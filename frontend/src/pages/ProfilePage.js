@@ -46,11 +46,29 @@ const ProfilePage = () => {
     preferred_translation: 'WEB',
     theme_preference: 'system'
   });
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    daily_devotional: true,
+    reading_plan_reminder: true,
+    weekly_sermon_updates: true,
+    reminder_time: '08:00'
+  });
 
   useEffect(() => {
     fetchProfile();
     fetchReadingProgress();
+    fetchNotificationPrefs();
   }, []);
+
+  const fetchNotificationPrefs = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/notifications/preferences`, {
+        headers: getAuthHeaders()
+      });
+      setNotificationPrefs(response.data);
+    } catch (error) {
+      console.error('Error fetching notification preferences:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
