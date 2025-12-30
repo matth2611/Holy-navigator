@@ -76,12 +76,36 @@ const BiblePage = () => {
     try {
       const response = await axios.get(`${API_URL}/bible/chapter/${currentBook}/${currentChapter}`);
       setVerses(response.data.verses);
+      setTranslation(response.data.translation || 'World English Bible');
     } catch (error) {
       console.error('Error fetching chapter:', error);
       toast.error('Failed to load chapter');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = async (e) => {
+    e?.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    setSearching(true);
+    try {
+      const response = await axios.get(`${API_URL}/bible/search/verses?q=${encodeURIComponent(searchQuery)}`);
+      setSearchResults(response.data.results);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Search failed');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const goToSearchResult = (result) => {
+    navigateToChapter(result.book, result.chapter);
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   const fetchBookmarks = async () => {
