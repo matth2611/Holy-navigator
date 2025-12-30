@@ -242,6 +242,84 @@ class HolyNavigatorAPITester:
         # Test invalid day
         self.run_test("Invalid Day (400)", "GET", "devotional/400", 404)
 
+    def test_reading_plan_endpoints(self):
+        """Test Bible in a Year reading plan endpoints"""
+        print("\n📅 Testing Reading Plan Endpoints...")
+        
+        # Test today's reading
+        success, today_data = self.run_test("Get Today's Reading", "GET", "reading-plan/today", 200)
+        if success and today_data:
+            day = today_data.get('day', 0)
+            theme = today_data.get('theme', '')
+            readings = today_data.get('readings', [])
+            date = today_data.get('date', '')
+            day_of_year = today_data.get('day_of_year', 0)
+            
+            print(f"   Today's reading: Day {day} - {theme}")
+            print(f"   Date: {date}, Day of year: {day_of_year}")
+            
+            # Check structure
+            required_fields = ['day', 'theme', 'readings']
+            missing_fields = [field for field in required_fields if field not in today_data]
+            if missing_fields:
+                self.log_result("Today's Reading Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("Today's Reading Structure", True)
+            
+            # Check readings array
+            if readings and len(readings) > 0:
+                self.log_result("Today's Reading Has Content", True)
+                print(f"   Readings: {', '.join(readings)}")
+            else:
+                self.log_result("Today's Reading Has Content", False, "No readings found")
+        
+        # Test reading plan with pagination
+        success, plan_data = self.run_test("Get Reading Plan (Page 1)", "GET", "reading-plan?page=1&limit=30", 200)
+        if success and plan_data:
+            readings = plan_data.get('readings', [])
+            total = plan_data.get('total', 0)
+            page = plan_data.get('page', 0)
+            pages = plan_data.get('pages', 0)
+            description = plan_data.get('description', '')
+            
+            print(f"   Reading plan: {len(readings)} readings on page {page} of {pages}")
+            print(f"   Total readings: {total}")
+            
+            # Check if we have 365 readings for full year
+            if total == 365:
+                self.log_result("Full Year Reading Plan (365 days)", True)
+                print(f"   ✓ Complete year with {total} readings")
+            else:
+                self.log_result("Full Year Reading Plan (365 days)", False, f"Expected 365 readings, got {total}")
+            
+            # Check description mentions Bible in a Year
+            if 'Bible in' in description and 'year' in description.lower():
+                self.log_result("Reading Plan Description", True)
+                print(f"   Description: {description}")
+            else:
+                self.log_result("Reading Plan Description", False, f"Description doesn't mention Bible in a year: {description}")
+        
+        # Test specific day reading
+        success, day_data = self.run_test("Get Day 1 Reading", "GET", "reading-plan/day/1", 200)
+        if success and day_data:
+            day = day_data.get('day', 0)
+            theme = day_data.get('theme', '')
+            readings = day_data.get('readings', [])
+            
+            if day == 1:
+                self.log_result("Specific Day Reading", True)
+                print(f"   Day 1: {theme} - {', '.join(readings) if readings else 'No readings'}")
+            else:
+                self.log_result("Specific Day Reading", False, f"Expected day 1, got day {day}")
+        
+        # Test another specific day
+        success, day_data = self.run_test("Get Day 100 Reading", "GET", "reading-plan/day/100", 200)
+        if success and day_data:
+            print(f"   Day 100: {day_data.get('theme', 'No theme')} - {', '.join(day_data.get('readings', []))}")
+        
+        # Test invalid day
+        self.run_test("Invalid Day Reading (400)", "GET", "reading-plan/day/400", 404)
+
     def test_auth_registration(self):
         """Test user registration"""
         print("\n👤 Testing User Registration...")
