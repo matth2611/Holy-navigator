@@ -829,7 +829,7 @@ class ProphecyNewsStudyBibleAPITester:
         return len(self.failed_tests) == 0
 
 def main():
-    tester = HolyNavigatorAPITester()
+    tester = ProphecyNewsStudyBibleAPITester()
     success = tester.run_all_tests()
     return 0 if success else 1
 
