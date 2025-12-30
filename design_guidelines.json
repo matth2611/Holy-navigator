@@ -1,0 +1,154 @@
+{
+  "identity": {
+    "name": "E1",
+    "archetype": "The Anti-AI Designer",
+    "mission": "Create a reverent yet modern digital sanctuary that bridges ancient scripture with contemporary news.",
+    "principles": [
+      "Fusion over Imitation: Blend 'Editorial Print' aesthetics with 'SaaS' functionality.",
+      "Emotion First: Every pixel must convey 'Peace' and 'Clarity'.",
+      "Content is King: Scripture readability is the highest priority.",
+      "Negative Space: Use generous margins to create a meditative reading environment."
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "primary": {
+        "name": "Crimson Pro",
+        "type": "Serif",
+        "usage": "Headings, Scripture Text, Pull Quotes",
+        "weights": ["400", "600", "700"],
+        "fallback": "Georgia, serif"
+      },
+      "secondary": {
+        "name": "Manrope",
+        "type": "Sans-serif",
+        "usage": "UI Elements, Navigation, Metadata, Buttons",
+        "weights": ["400", "500", "600"],
+        "fallback": "system-ui, sans-serif"
+      }
+    },
+    "scale": {
+      "h1": "text-4xl md:text-6xl font-serif tracking-tight leading-tight",
+      "h2": "text-3xl md:text-4xl font-serif tracking-tight",
+      "h3": "text-2xl md:text-3xl font-serif",
+      "body_lg": "text-lg md:text-xl font-serif leading-relaxed",
+      "body_base": "text-base font-sans leading-normal",
+      "caption": "text-sm font-sans text-muted-foreground tracking-wide uppercase"
+    },
+    "rules": [
+      "NEVER use Inter for headings.",
+      "Scripture text must always use Crimson Pro with relaxed leading (leading-loose).",
+      "UI labels must be Manrope.",
+      "Use 'tracking-widest' for small overline labels (e.g., 'DAILY DEVOTIONAL')."
+    ]
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "name": "Celestial Blue",
+        "hex": "#0A2463",
+        "tailwind": "bg-[#0A2463] text-white"
+      },
+      "accent": {
+        "name": "Divine Gold",
+        "hex": "#C5A059",
+        "tailwind": "text-[#C5A059] border-[#C5A059]"
+      },
+      "light": {
+        "background": "#FDFBF7",
+        "surface": "#FFFFFF",
+        "text": "#1A1A1A",
+        "muted": "#F2F0E9"
+      },
+      "dark": {
+        "background": "#020617",
+        "surface": "#0F172A",
+        "text": "#F8FAFC",
+        "muted": "#1E293B"
+      }
+    },
+    "semantic": {
+      "brand": "primary",
+      "cta": "primary",
+      "link": "accent",
+      "success": "#059669",
+      "error": "#DC2626",
+      "warning": "#D97706"
+    },
+    "gradients": {
+      "hero": "bg-gradient-to-br from-[#0A2463] to-[#0F172A]",
+      "gold_shimmer": "bg-gradient-to-r from-[#C5A059] via-[#E5C57F] to-[#C5A059]"
+    }
+  },
+  "layout": {
+    "spacing": {
+      "container_padding": "px-6 md:px-12 lg:px-24",
+      "section_gap": "py-20 md:py-32",
+      "element_gap": "gap-6 md:gap-8"
+    },
+    "grids": {
+      "marketing": "grid grid-cols-1 md:grid-cols-12 gap-8",
+      "dashboard": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+      "reading": "max-w-2xl mx-auto"
+    },
+    "border_radius": {
+      "default": "rounded-xl",
+      "card": "rounded-2xl",
+      "button": "rounded-full"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#0A2463] text-white hover:bg-[#0A2463]/90 rounded-full px-8 py-6 font-sans font-medium transition-all hover:scale-105 shadow-lg shadow-blue-900/20",
+      "secondary": "bg-transparent border-2 border-[#0A2463] text-[#0A2463] hover:bg-[#0A2463]/5 rounded-full px-8 py-6 font-sans font-medium",
+      "ghost": "text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg px-4 py-2"
+    },
+    "cards": {
+      "style": "bg-card border border-border/40 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden",
+      "news_card": "group relative h-full flex flex-col justify-end p-6 overflow-hidden rounded-2xl border-0"
+    },
+    "inputs": {
+      "style": "bg-muted/30 border-border/50 focus:border-[#0A2463] focus:ring-1 focus:ring-[#0A2463] rounded-lg h-12 px-4 font-sans"
+    },
+    "navigation": {
+      "style": "backdrop-blur-xl bg-background/80 border-b border-border/40 sticky top-0 z-50"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_texture": {
+        "url": "https://images.unsplash.com/photo-1704742436082-8b7a78bc344f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGJsdWUlMjBhbmQlMjBnb2xkJTIwdGV4dHVyZSUyMGx1eHVyeXxlbnwwfHx8fDE3NjcxMTU4NjR8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "Abstract Blue and Gold Texture",
+        "usage": "Hero backgrounds, section dividers, branding elements"
+      },
+      "devotional_reading": {
+        "url": "https://images.unsplash.com/photo-1741249075351-c09637c89bf7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjByZWFkaW5nJTIwYmlibGUlMjBtb3JuaW5nJTIwbGlnaHR8ZW58MHx8fHwxNzY3MTE1ODYzfDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Woman reading in sunlight",
+        "usage": "Daily Devotional section, Landing page feature"
+      },
+      "community_discussion": {
+        "url": "https://images.unsplash.com/photo-1629141650344-db693cfd6d48?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxkaXZlcnNlJTIwZ3JvdXAlMjBkaXNjdXNzaW9uJTIwY29mZmVlJTIwc2hvcHxlbnwwfHx8fDE3NjcxMTU4NjZ8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "Small group discussion",
+        "usage": "Community Forum promo, About page"
+      }
+    },
+    "icons": {
+      "library": "lucide-react",
+      "style": "stroke-width={1.5}"
+    }
+  },
+  "motion": {
+    "transitions": "transition-all duration-300 ease-out",
+    "hover_lift": "hover:-translate-y-1 hover:shadow-lg",
+    "fade_in": "animate-in fade-in duration-500 slide-in-from-bottom-4"
+  },
+  "universal_guidelines": [
+    "Avoid 'AI Slop': Do not use generic gradients or default Shadcn styling without customization.",
+    "Dark Mode First: Design for dark mode as a 'Night Vigil' mode, but ensure Light Mode feels like 'Morning Light'.",
+    "Accessibility: Ensure text contrast is high, especially gold text on white backgrounds (use darker gold #B49048 if needed).",
+    "Data Test IDs: All interactive elements must have data-testid attributes.",
+    "No Transparent Backgrounds: Use blur/scrim for overlays.",
+    "Use 'sonner' for toasts."
+  ],
+  "instructions_to_main_agent": "You are building a premium Bible-News analysis app. Use the provided colors and fonts to create a 'Modern Scripture' aesthetic. The 'News-Scripture Analysis' is the core feature—make it look like a high-end editorial piece. The Bible Reader should be distraction-free. Use the 'Divine Gold' sparingly for accents and active states. Implement the 'Tetris' grid for the landing page."
+}
