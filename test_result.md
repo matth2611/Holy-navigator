@@ -230,11 +230,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "App renaming to Prophecy News Study Bible"
-    - "Reading Plan Page UI"
-    - "Reading Plan API endpoints"
-    - "User progress tracking for Reading Plan"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
