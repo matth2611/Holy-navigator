@@ -236,6 +236,11 @@ class HolyNavigatorAPITester:
             "news_headline": "Test headline",
             "news_content": "Test content"
         })
+        
+        # Test media library endpoints without premium
+        self.run_test("Media Videos (No Premium)", "GET", "media/videos", 403)
+        self.run_test("Media Audio (No Premium)", "GET", "media/audio", 403)
+        self.run_test("Media All (No Premium)", "GET", "media/all", 403)
 
     def test_unauthenticated_access(self):
         """Test endpoints that require authentication without token"""
