@@ -116,6 +116,9 @@ backend:
       - working: true
         agent: "main"
         comment: "API returns 'Prophecy News Study Bible API' correctly"
+      - working: true
+        agent: "testing"
+        comment: "✅ API ROOT VERIFIED: GET /api/ returns correct branding 'Prophecy News Study Bible API'. Health check endpoint working."
 
   - task: "Reading Plan API endpoints"
     implemented: true
