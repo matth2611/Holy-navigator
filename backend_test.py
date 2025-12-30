@@ -797,6 +797,7 @@ class HolyNavigatorAPITester:
         self.test_bible_endpoints()
         self.test_dictionary_endpoints()
         self.test_devotional_endpoints()
+        self.test_reading_plan_endpoints()
         
         # Authentication flow
         email, password = self.test_auth_registration()
@@ -805,6 +806,7 @@ class HolyNavigatorAPITester:
         
         # Protected endpoints
         self.test_bookmarks_protected()
+        self.test_reading_plan_progress()
         self.test_profile_endpoints()
         self.test_premium_endpoints_without_subscription()
         self.test_premium_media_library()
