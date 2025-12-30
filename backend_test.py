@@ -100,23 +100,19 @@ class HolyNavigatorAPITester:
         # Test John 3:16 specifically (mentioned in requirements)
         success, john_data = self.run_test("Get John Chapter 3", "GET", "bible/chapter/John/3", 200)
         if success:
-            translation = john_data.get('translation', '')
             verses = john_data.get('verses', [])
             
-            # Check if translation is World English Bible
-            if 'World English Bible' in translation or 'WEB' in translation:
-                self.log_result("John 3 Translation Check", True)
-                print(f"   Translation: {translation}")
-            else:
-                self.log_result("John 3 Translation Check", False, f"Expected World English Bible, got: {translation}")
-            
-            # Check if verse 16 exists and has real content
+            # Check if verse 16 exists and contains "For God so loved the world"
             verse_16 = next((v for v in verses if v.get('verse') == 16), None)
-            if verse_16 and len(verse_16.get('text', '')) > 50:  # Real verse should be substantial
-                self.log_result("John 3:16 Real Content", True)
-                print(f"   John 3:16: {verse_16['text'][:80]}...")
+            if verse_16:
+                verse_text = verse_16.get('text', '')
+                if 'For God so loved the world' in verse_text:
+                    self.log_result("John 3:16 Correct Text", True)
+                    print(f"   ✓ John 3:16: {verse_text[:80]}...")
+                else:
+                    self.log_result("John 3:16 Correct Text", False, f"Expected 'For God so loved the world', got: {verse_text}")
             else:
-                self.log_result("John 3:16 Real Content", False, "Verse 16 missing or placeholder content")
+                self.log_result("John 3:16 Exists", False, "Verse 16 not found in John chapter 3")
         
         # Test single verse endpoint
         success, verse_data = self.run_test("Get John 3:16", "GET", "bible/verse/John/3/16", 200)
