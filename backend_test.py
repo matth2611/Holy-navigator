@@ -269,7 +269,16 @@ class ProphecyNewsStudyBibleAPITester:
             # Check readings array
             if readings and len(readings) > 0:
                 self.log_result("Today's Reading Has Content", True)
-                print(f"   Readings: {', '.join(readings)}")
+                # Format readings for display
+                reading_strs = []
+                for reading in readings:
+                    if isinstance(reading, dict):
+                        book = reading.get('book', '')
+                        chapters = reading.get('chapters', '')
+                        reading_strs.append(f"{book} {chapters}")
+                    else:
+                        reading_strs.append(str(reading))
+                print(f"   Readings: {', '.join(reading_strs)}")
             else:
                 self.log_result("Today's Reading Has Content", False, "No readings found")
         
