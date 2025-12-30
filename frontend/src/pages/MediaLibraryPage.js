@@ -215,11 +215,13 @@ const MediaLibraryPage = () => {
               {audio.map((sermon) => (
                 <div 
                   key={sermon.id}
-                  className="bg-card border border-border/40 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-start md:items-center hover:shadow-lg transition-all duration-300"
+                  className={`bg-card border rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-start md:items-center hover:shadow-lg transition-all duration-300 ${
+                    sermon.listened ? 'border-green-500/50 bg-green-500/5' : 'border-border/40'
+                  }`}
                   data-testid={`audio-card-${sermon.id}`}
                 >
                   {/* Play Button */}
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 relative">
                     <button
                       onClick={() => setSelectedAudio(selectedAudio?.id === sermon.id ? null : sermon)}
                       className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${
@@ -231,6 +233,11 @@ const MediaLibraryPage = () => {
                     >
                       <Headphones className="w-7 h-7" />
                     </button>
+                    {sermon.listened && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      </div>
+                    )}
                   </div>
                   
                   {/* Content */}
@@ -243,6 +250,11 @@ const MediaLibraryPage = () => {
                         <Clock className="w-3 h-3" />
                         {sermon.duration}
                       </span>
+                      {sermon.listened && (
+                        <span className="px-2 py-0.5 bg-green-500/20 text-green-600 rounded-full text-xs font-medium">
+                          Listened
+                        </span>
+                      )}
                     </div>
                     <h3 className="font-serif text-xl font-semibold mb-1">
                       {sermon.title}
@@ -263,6 +275,7 @@ const MediaLibraryPage = () => {
                           controls 
                           className="w-full" 
                           autoPlay
+                          onEnded={() => !sermon.listened && trackMedia(sermon.id, false)}
                           data-testid={`audio-player-${sermon.id}`}
                         >
                           <source src={sermon.audio_url} type="audio/mpeg" />
@@ -271,6 +284,20 @@ const MediaLibraryPage = () => {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Track Button */}
+                  <button
+                    onClick={() => trackMedia(sermon.id, sermon.listened)}
+                    className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                    title={sermon.listened ? "Unmark as listened" : "Mark as listened"}
+                    data-testid={`track-audio-${sermon.id}`}
+                  >
+                    {sermon.listened ? (
+                      <CheckCircle className="w-6 h-6 text-green-500" />
+                    ) : (
+                      <Circle className="w-6 h-6" />
+                    )}
+                  </button>
                 </div>
               ))}
             </div>
