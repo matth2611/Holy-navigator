@@ -745,12 +745,6 @@ async def get_devotional_by_day(day: int):
     if day < 1 or day > len(FULL_YEAR_DEVOTIONALS):
         raise HTTPException(status_code=404, detail="Devotional not found for this day")
     return FULL_YEAR_DEVOTIONALS[day - 1]
-    devotional = DAILY_DEVOTIONALS[index]
-    return {**devotional, "date": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
-
-@api_router.get("/devotional/all")
-async def get_all_devotionals():
-    return {"devotionals": DAILY_DEVOTIONALS}
 
 # ==================== PROFILE ENDPOINTS ====================
 
