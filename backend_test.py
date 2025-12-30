@@ -159,11 +159,45 @@ class HolyNavigatorAPITester:
         
         success, dict_data = self.run_test("Get Dictionary", "GET", "bible/dictionary", 200)
         if success and dict_data.get('words'):
-            print(f"   Found {len(dict_data['words'])} dictionary entries")
+            words = dict_data['words']
+            print(f"   Found {len(words)} dictionary entries")
+            
+            # Check if we have at least 30 terms as required
+            if len(words) >= 30:
+                self.log_result("Dictionary Size (30+ terms)", True)
+                print(f"   ✓ Dictionary has {len(words)} terms (requirement: 30+)")
+            else:
+                self.log_result("Dictionary Size (30+ terms)", False, f"Only {len(words)} terms, need 30+")
+            
+            # Check for specific new terms mentioned in requirements
+            word_names = [w.get('word', '').lower() for w in words]
+            required_terms = ['rapture', 'tribulation', 'millennium']
+            found_terms = [term for term in required_terms if term in word_names]
+            
+            if len(found_terms) == len(required_terms):
+                self.log_result("New Prophecy Terms", True)
+                print(f"   ✓ Found required terms: {', '.join(found_terms)}")
+            else:
+                missing_terms = [term for term in required_terms if term not in found_terms]
+                self.log_result("New Prophecy Terms", False, f"Missing terms: {missing_terms}")
+            
+            # Check for Hebrew/Greek origins
+            sample_word = words[0] if words else {}
+            if 'hebrew' in sample_word and 'greek' in sample_word:
+                self.log_result("Hebrew/Greek Origins", True)
+                print(f"   ✓ Dictionary includes Hebrew/Greek origins")
+            else:
+                self.log_result("Hebrew/Greek Origins", False, "Missing Hebrew/Greek origin information")
         
         # Test specific word lookup
         self.run_test("Get Word 'grace'", "GET", "bible/dictionary/grace", 200)
         self.run_test("Get Word 'faith'", "GET", "bible/dictionary/faith", 200)
+        
+        # Test new prophecy terms
+        self.run_test("Get Word 'rapture'", "GET", "bible/dictionary/rapture", 200)
+        self.run_test("Get Word 'tribulation'", "GET", "bible/dictionary/tribulation", 200)
+        self.run_test("Get Word 'millennium'", "GET", "bible/dictionary/millennium", 200)
+        
         self.run_test("Invalid Word", "GET", "bible/dictionary/nonexistentword", 404)
         
         # Test search
