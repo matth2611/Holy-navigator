@@ -263,20 +263,79 @@ const BiblePage = () => {
                   <h1 className="font-serif text-3xl md:text-4xl font-bold" data-testid="chapter-title">
                     {currentBook} {currentChapter}
                   </h1>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={addBookmark}
-                  className={isBookmarked ? 'text-[#C5A059]' : ''}
-                  data-testid="bookmark-btn"
-                >
-                  {isBookmarked ? (
-                    <BookMarked className="w-5 h-5" />
-                  ) : (
-                    <Bookmark className="w-5 h-5" />
+                  {translation && (
+                    <p className="text-sm text-muted-foreground mt-1">{translation}</p>
                   )}
-                </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Search Button */}
+                  <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="icon" data-testid="search-btn">
+                        <Search className="w-5 h-5" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px]">
+                      <DialogHeader>
+                        <DialogTitle className="font-serif text-2xl">Search Scripture</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleSearch} className="mt-4">
+                        <div className="flex gap-2">
+                          <Input
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search for words or phrases..."
+                            className="flex-1"
+                            data-testid="search-input"
+                          />
+                          <Button type="submit" disabled={searching} data-testid="search-submit">
+                            {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </form>
+                      
+                      {searchResults.length > 0 && (
+                        <div className="mt-4 max-h-64 overflow-y-auto space-y-2">
+                          {searchResults.map((result, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => goToSearchResult(result)}
+                              className="w-full text-left p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                              data-testid={`search-result-${idx}`}
+                            >
+                              <p className="font-semibold text-sm text-[#0A2463] dark:text-[#C5A059]">
+                                {result.reference}
+                              </p>
+                              <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                                {result.text}
+                              </p>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {searchQuery && searchResults.length === 0 && !searching && (
+                        <p className="text-center text-muted-foreground mt-4 text-sm">
+                          No results found. Try different keywords.
+                        </p>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                  
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={addBookmark}
+                    className={isBookmarked ? 'text-[#C5A059]' : ''}
+                    data-testid="bookmark-btn"
+                  >
+                    {isBookmarked ? (
+                      <BookMarked className="w-5 h-5" />
+                    ) : (
+                      <Bookmark className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
               </div>
               
               {/* Chapter Selector */}
