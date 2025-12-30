@@ -1338,6 +1338,19 @@ class ProphecyNewsStudyBibleAPITester:
         self.test_unauthenticated_access()
         self.test_subscription_endpoints()
         
+        # NEW FEATURES TESTING (as requested in review)
+        print("\n" + "=" * 60)
+        print("🆕 TESTING NEW FEATURES (Review Request)")
+        print("=" * 60)
+        
+        # Test notification preferences (non-premium)
+        self.test_notification_preferences_api()
+        
+        # Test premium features (requires premium user)
+        self.test_media_tracking_api()
+        self.test_news_scripture_analysis_api()
+        self.test_audio_urls_verification()
+        
         # Print summary
         print("\n" + "=" * 60)
         print(f"📊 Test Summary:")
