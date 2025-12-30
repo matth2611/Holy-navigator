@@ -139,7 +139,9 @@ const MediaLibraryPage = () => {
               {videos.map((video) => (
                 <div 
                   key={video.id}
-                  className="bg-card border border-border/40 rounded-2xl overflow-hidden group hover:shadow-lg transition-all duration-300 card-hover"
+                  className={`bg-card border rounded-2xl overflow-hidden group hover:shadow-lg transition-all duration-300 card-hover ${
+                    video.watched ? 'border-green-500/50 bg-green-500/5' : 'border-border/40'
+                  }`}
                   data-testid={`video-card-${video.id}`}
                 >
                   {/* Thumbnail */}
@@ -163,14 +165,33 @@ const MediaLibraryPage = () => {
                       <Clock className="w-3 h-3" />
                       {video.duration}
                     </div>
+                    {/* Watched Badge */}
+                    {video.watched && (
+                      <div className="absolute top-2 left-2 px-2 py-1 bg-green-500 rounded text-white text-xs flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Watched
+                      </div>
+                    )}
                   </div>
                   
                   {/* Content */}
                   <div className="p-5">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center justify-between mb-2">
                       <span className="px-2 py-0.5 bg-[#0A2463]/10 dark:bg-[#C5A059]/10 rounded-full text-xs font-medium text-[#0A2463] dark:text-[#C5A059]">
                         {video.category}
                       </span>
+                      <button
+                        onClick={() => trackMedia(video.id, video.watched)}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        title={video.watched ? "Unmark as watched" : "Mark as watched"}
+                        data-testid={`track-video-${video.id}`}
+                      >
+                        {video.watched ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <Circle className="w-5 h-5" />
+                        )}
+                      </button>
                     </div>
                     <h3 className="font-serif text-lg font-semibold mb-2 line-clamp-2">
                       {video.title}
