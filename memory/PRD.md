@@ -51,6 +51,14 @@ Build an app that takes current news events and relates them to biblical scriptu
 - ✅ Audio player for sermons
 - ✅ Categories: Revelation, Daniel, Prophecy, Eschatology, End Times, Second Coming, Tribulation, Israel
 
+### December 30, 2025 - Major Enhancements
+- ✅ **Bible API Integration** - Real verse text from World English Bible (bible-api.com)
+- ✅ **Bible Search Functionality** - Search across scripture with keyword highlighting
+- ✅ **User Profile Page** - Stats, settings, reading progress tracking
+- ✅ **365 Daily Devotionals** - Full year of devotional content
+- ✅ **Expanded Dictionary** - 30 biblical terms with Hebrew/Greek origins
+- ✅ **Prophecy Terms** - rapture, tribulation, millennium, antichrist, prophecy
+
 ## Premium Features ($9.99/month)
 1. News-Scripture AI Analysis
 2. Community Forum Access
@@ -59,10 +67,12 @@ Build an app that takes current news events and relates them to biblical scriptu
 5. Ad-free Experience
 
 ## Free Features
-1. Complete Bible (66 books)
-2. Daily Devotionals
-3. Bible Dictionary
-4. Bookmarking
+1. Complete Bible (66 books) with real verse text
+2. Daily Devotionals (365 days)
+3. Bible Dictionary (30 terms)
+4. Bible Search
+5. Bookmarking
+6. User Profile with reading progress
 
 ## Technology Stack
 - **Frontend**: React, Tailwind CSS, Shadcn/UI
@@ -71,6 +81,7 @@ Build an app that takes current news events and relates them to biblical scriptu
 - **AI**: Emergent LLM Key (OpenAI GPT-5.2)
 - **Payments**: Stripe
 - **Auth**: JWT + Emergent Google OAuth
+- **Bible API**: bible-api.com (World English Bible)
 
 ## Prioritized Backlog
 
@@ -80,42 +91,51 @@ Build an app that takes current news events and relates them to biblical scriptu
 - [x] Stripe subscription
 - [x] News-Scripture Analysis
 - [x] Media Library
+- [x] Bible API integration
+- [x] Bible search
+- [x] Profile page
+- [x] 365 devotionals
+- [x] Expanded dictionary
 
 ### P1 - High Priority
-- [ ] Full Bible verse text (currently placeholder for most chapters)
-- [ ] Search functionality across Bible
-- [ ] User profile page with settings
-- [ ] Email notifications for forum replies
+- [ ] Email notifications for daily devotionals
+- [ ] Bible verse highlighting and notes
+- [ ] More Bible translations (KJV, ASV)
+- [ ] Sermon favorites/playlist feature
 
 ### P2 - Medium Priority
 - [ ] Bible reading plans
 - [ ] Scripture sharing to social media
-- [ ] Verse highlighting and notes
-- [ ] More devotionals (365 for full year)
-- [ ] More dictionary terms
+- [ ] More video/audio sermons
+- [ ] Offline Bible reading
 
 ### P3 - Nice to Have
 - [ ] Bible comparison (multiple translations)
-- [ ] Audio Bible integration
 - [ ] Mobile app (React Native)
 - [ ] Study groups feature
 - [ ] Push notifications
+- [ ] Sermon watch history
 
 ## Next Action Items
-1. Add complete Bible verse text via Bible API integration
-2. Implement search functionality
-3. Build user profile/settings page
-4. Add more devotional content
-5. Expand Bible dictionary
+1. Add email notification system for daily devotionals
+2. Implement Bible verse highlighting and personal notes
+3. Add more Bible translations
+4. Create sermon favorites/playlist feature
+5. Build reading plans system
 
 ## API Endpoints
 
 ### Public
 - GET /api/bible/books
 - GET /api/bible/chapter/{book}/{chapter}
+- GET /api/bible/verse/{book}/{chapter}/{verse}
+- GET /api/bible/search/verses?q={query}
 - GET /api/bible/dictionary
+- GET /api/bible/dictionary/{word}
+- GET /api/bible/search?q={query}
 - GET /api/devotional/today
 - GET /api/devotional/all
+- GET /api/devotional/{day}
 
 ### Protected (Auth Required)
 - POST /api/auth/register
@@ -124,6 +144,9 @@ Build an app that takes current news events and relates them to biblical scriptu
 - POST /api/bookmarks
 - GET /api/bookmarks
 - DELETE /api/bookmarks/{id}
+- GET /api/profile
+- PUT /api/profile
+- GET /api/profile/reading-progress
 
 ### Premium (Subscription Required)
 - POST /api/analyze/news
