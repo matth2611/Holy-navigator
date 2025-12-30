@@ -786,7 +786,7 @@ class ProphecyNewsStudyBibleAPITester:
 
     def run_all_tests(self):
         """Run all tests in sequence"""
-        print("🚀 Starting Holy Navigator API Tests")
+        print("🚀 Starting Prophecy News Study Bible API Tests")
         print(f"Testing against: {self.base_url}")
         print("=" * 60)
         
