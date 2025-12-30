@@ -431,6 +431,7 @@ class HolyNavigatorAPITester:
         # Protected endpoints
         self.test_bookmarks_protected()
         self.test_premium_endpoints_without_subscription()
+        self.test_premium_media_library()
         self.test_unauthenticated_access()
         self.test_subscription_endpoints()
         
