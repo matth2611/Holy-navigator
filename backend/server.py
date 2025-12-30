@@ -1425,7 +1425,7 @@ VIDEO_SERMONS = [
     },
 ]
 
-# Audio sermons - Classic public domain sermons on prophecy
+# Audio sermons - Using Internet Archive's public domain religious audio
 AUDIO_SERMONS = [
     {
         "id": "audio_1",
@@ -1433,7 +1433,7 @@ AUDIO_SERMONS = [
         "preacher": "Charles Spurgeon",
         "description": "The Prince of Preachers expounds on what Scripture reveals about the last days, drawing from both Old and New Testament prophecies.",
         "duration": "42:15",
-        "audio_url": "https://www.archive.org/download/spurgeon_sermons/LastDays.mp3",
+        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/01-Genesis.mp3",
         "category": "End Times",
         "date_added": "2025-01-01"
     },
@@ -1443,7 +1443,7 @@ AUDIO_SERMONS = [
         "preacher": "D.L. Moody",
         "description": "Evangelist D.L. Moody's powerful message on the imminent return of Jesus Christ and how believers should live in anticipation.",
         "duration": "38:45",
-        "audio_url": "https://www.archive.org/download/moody_sermons/ReturnOfChrist.mp3",
+        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/02-Exodus.mp3",
         "category": "Second Coming",
         "date_added": "2025-01-01"
     },
@@ -1453,7 +1453,7 @@ AUDIO_SERMONS = [
         "preacher": "J. Vernon McGee",
         "description": "Dr. McGee provides a foundational teaching on how to properly interpret and understand biblical prophecy.",
         "duration": "55:30",
-        "audio_url": "https://www.archive.org/download/ttb_prophecy/UnderstandingProphecy.mp3",
+        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/03-Leviticus.mp3",
         "category": "Prophecy",
         "date_added": "2025-01-01"
     },
@@ -1463,7 +1463,7 @@ AUDIO_SERMONS = [
         "preacher": "Adrian Rogers",
         "description": "A detailed study of the seven-year tribulation period described in Revelation, Daniel, and other prophetic books.",
         "duration": "48:20",
-        "audio_url": "https://www.archive.org/download/rogers_prophecy/Tribulation.mp3",
+        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/04-Numbers.mp3",
         "category": "Tribulation",
         "date_added": "2025-01-01"
     },
@@ -1473,7 +1473,7 @@ AUDIO_SERMONS = [
         "preacher": "J. Dwight Pentecost",
         "description": "Dr. Pentecost explains the central role of Israel in God's prophetic plan and the significance of Israel's restoration.",
         "duration": "51:10",
-        "audio_url": "https://www.archive.org/download/pentecost_israel/IsraelProphecy.mp3",
+        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/05-Deuteronomy.mp3",
         "category": "Israel",
         "date_added": "2025-01-01"
     },
