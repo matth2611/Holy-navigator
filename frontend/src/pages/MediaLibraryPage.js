@@ -12,8 +12,11 @@ import {
   User,
   Tag,
   Bell,
-  X
+  X,
+  CheckCircle,
+  Circle
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -23,6 +26,7 @@ const MediaLibraryPage = () => {
   const [audio, setAudio] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
+  const [stats, setStats] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [selectedAudio, setSelectedAudio] = useState(null);
   const [activeTab, setActiveTab] = useState('videos');
@@ -39,10 +43,30 @@ const MediaLibraryPage = () => {
       setVideos(response.data.videos);
       setAudio(response.data.audio);
       setNotice(response.data.notice);
+      setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching media:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const trackMedia = async (mediaId, isTracked) => {
+    try {
+      if (isTracked) {
+        await axios.delete(`${API_URL}/media/track/${mediaId}`, {
+          headers: getAuthHeaders()
+        });
+        toast.success('Removed from watched list');
+      } else {
+        await axios.post(`${API_URL}/media/track/${mediaId}`, {}, {
+          headers: getAuthHeaders()
+        });
+        toast.success('Marked as watched');
+      }
+      fetchMedia(); // Refresh to update status
+    } catch (error) {
+      toast.error('Failed to update watch status');
     }
   };
 
