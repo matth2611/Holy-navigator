@@ -317,7 +317,16 @@ class ProphecyNewsStudyBibleAPITester:
             
             if day == 1:
                 self.log_result("Specific Day Reading", True)
-                print(f"   Day 1: {theme} - {', '.join(readings) if readings else 'No readings'}")
+                # Format readings for display
+                reading_strs = []
+                for reading in readings:
+                    if isinstance(reading, dict):
+                        book = reading.get('book', '')
+                        chapters = reading.get('chapters', '')
+                        reading_strs.append(f"{book} {chapters}")
+                    else:
+                        reading_strs.append(str(reading))
+                print(f"   Day 1: {theme} - {', '.join(reading_strs) if reading_strs else 'No readings'}")
             else:
                 self.log_result("Specific Day Reading", False, f"Expected day 1, got day {day}")
         
