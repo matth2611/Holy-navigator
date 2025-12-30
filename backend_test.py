@@ -210,10 +210,29 @@ class HolyNavigatorAPITester:
         success, today_data = self.run_test("Get Today's Devotional", "GET", "devotional/today", 200)
         if success and today_data:
             print(f"   Today's devotional: '{today_data.get('title', 'N/A')}'")
+            day_of_year = today_data.get('day_of_year', 0)
+            print(f"   Day of year: {day_of_year}")
         
         success, all_data = self.run_test("Get All Devotionals", "GET", "devotional/all", 200)
         if success and all_data.get('devotionals'):
-            print(f"   Found {len(all_data['devotionals'])} devotionals")
+            devotionals = all_data['devotionals']
+            total = all_data.get('total', 0)
+            print(f"   Found {len(devotionals)} devotionals (total: {total})")
+            
+            # Check if we have 365 devotionals for full year
+            if total >= 365:
+                self.log_result("Full Year Devotionals (365)", True)
+                print(f"   ✓ Full year coverage with {total} devotionals")
+            else:
+                self.log_result("Full Year Devotionals (365)", False, f"Only {total} devotionals, need 365")
+        
+        # Test specific day devotional
+        self.run_test("Get Day 1 Devotional", "GET", "devotional/1", 200)
+        self.run_test("Get Day 100 Devotional", "GET", "devotional/100", 200)
+        self.run_test("Get Day 365 Devotional", "GET", "devotional/365", 200)
+        
+        # Test invalid day
+        self.run_test("Invalid Day (400)", "GET", "devotional/400", 404)
 
     def test_auth_registration(self):
         """Test user registration"""
