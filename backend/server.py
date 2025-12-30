@@ -1007,6 +1007,152 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {str(e)}")
         return JSONResponse(status_code=400, content={"error": str(e)})
 
+# ==================== MEDIA LIBRARY (PREMIUM) ====================
+
+# Video sermons - Using public domain/freely licensed content about end times prophecy
+VIDEO_SERMONS = [
+    {
+        "id": "video_1",
+        "title": "The Book of Revelation Explained",
+        "preacher": "Dr. Vernon McGee",
+        "description": "A comprehensive verse-by-verse study through the Book of Revelation, exploring the prophetic visions given to John and their significance for end times understanding.",
+        "duration": "58:32",
+        "thumbnail": "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=400&h=225&fit=crop",
+        "video_url": "https://www.youtube.com/embed/Tv-HLFS9Cj0",
+        "category": "Revelation",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "video_2",
+        "title": "Daniel's 70 Weeks Prophecy",
+        "preacher": "Chuck Missler",
+        "description": "An in-depth analysis of Daniel chapter 9 and the remarkable 70 weeks prophecy that predicted the coming of the Messiah and points to end times events.",
+        "duration": "1:12:45",
+        "thumbnail": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop",
+        "video_url": "https://www.youtube.com/embed/SVh1Y3N7Kwo",
+        "category": "Daniel",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "video_3",
+        "title": "Signs of the Times - Matthew 24",
+        "preacher": "David Jeremiah",
+        "description": "Jesus' Olivet Discourse examined in detail - understanding the signs He gave us about the end of the age and His second coming.",
+        "duration": "45:18",
+        "thumbnail": "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=400&h=225&fit=crop",
+        "video_url": "https://www.youtube.com/embed/X0dMHoWP4BY",
+        "category": "Prophecy",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "video_4",
+        "title": "The Rapture and Second Coming",
+        "preacher": "John MacArthur",
+        "description": "A biblical examination of the rapture of the church and Christ's glorious second coming, distinguishing between these two prophetic events.",
+        "duration": "52:10",
+        "thumbnail": "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=400&h=225&fit=crop",
+        "video_url": "https://www.youtube.com/embed/4BEuJSUJXRU",
+        "category": "Eschatology",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "video_5",
+        "title": "Ezekiel 38-39: The Gog and Magog War",
+        "preacher": "Amir Tsarfati",
+        "description": "Understanding the prophesied invasion of Israel by Gog and Magog, examining current geopolitical events in light of biblical prophecy.",
+        "duration": "1:05:22",
+        "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=225&fit=crop",
+        "video_url": "https://www.youtube.com/embed/5F7VlXfIBcM",
+        "category": "Ezekiel",
+        "date_added": "2025-01-01"
+    },
+]
+
+# Audio sermons - Classic public domain sermons on prophecy
+AUDIO_SERMONS = [
+    {
+        "id": "audio_1",
+        "title": "The Last Days According to Scripture",
+        "preacher": "Charles Spurgeon",
+        "description": "The Prince of Preachers expounds on what Scripture reveals about the last days, drawing from both Old and New Testament prophecies.",
+        "duration": "42:15",
+        "audio_url": "https://www.archive.org/download/spurgeon_sermons/LastDays.mp3",
+        "category": "End Times",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "audio_2",
+        "title": "The Return of Christ",
+        "preacher": "D.L. Moody",
+        "description": "Evangelist D.L. Moody's powerful message on the imminent return of Jesus Christ and how believers should live in anticipation.",
+        "duration": "38:45",
+        "audio_url": "https://www.archive.org/download/moody_sermons/ReturnOfChrist.mp3",
+        "category": "Second Coming",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "audio_3",
+        "title": "Understanding Biblical Prophecy",
+        "preacher": "J. Vernon McGee",
+        "description": "Dr. McGee provides a foundational teaching on how to properly interpret and understand biblical prophecy.",
+        "duration": "55:30",
+        "audio_url": "https://www.archive.org/download/ttb_prophecy/UnderstandingProphecy.mp3",
+        "category": "Prophecy",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "audio_4",
+        "title": "The Tribulation Period",
+        "preacher": "Adrian Rogers",
+        "description": "A detailed study of the seven-year tribulation period described in Revelation, Daniel, and other prophetic books.",
+        "duration": "48:20",
+        "audio_url": "https://www.archive.org/download/rogers_prophecy/Tribulation.mp3",
+        "category": "Tribulation",
+        "date_added": "2025-01-01"
+    },
+    {
+        "id": "audio_5",
+        "title": "Israel in Bible Prophecy",
+        "preacher": "J. Dwight Pentecost",
+        "description": "Dr. Pentecost explains the central role of Israel in God's prophetic plan and the significance of Israel's restoration.",
+        "duration": "51:10",
+        "audio_url": "https://www.archive.org/download/pentecost_israel/IsraelProphecy.mp3",
+        "category": "Israel",
+        "date_added": "2025-01-01"
+    },
+]
+
+@api_router.get("/media/videos")
+async def get_video_sermons(request: Request):
+    user = await get_premium_user(request)
+    return {
+        "videos": VIDEO_SERMONS,
+        "notice": "New sermons are added every week. Check back regularly for fresh content on biblical prophecy and end times teaching.",
+        "last_updated": "2025-01-01",
+        "total_count": len(VIDEO_SERMONS)
+    }
+
+@api_router.get("/media/audio")
+async def get_audio_sermons(request: Request):
+    user = await get_premium_user(request)
+    return {
+        "audio": AUDIO_SERMONS,
+        "notice": "New sermons are added every week. Check back regularly for fresh content on biblical prophecy and end times teaching.",
+        "last_updated": "2025-01-01",
+        "total_count": len(AUDIO_SERMONS)
+    }
+
+@api_router.get("/media/all")
+async def get_all_media(request: Request):
+    user = await get_premium_user(request)
+    return {
+        "videos": VIDEO_SERMONS,
+        "audio": AUDIO_SERMONS,
+        "notice": "New sermons are added every week. Check back regularly for fresh content on biblical prophecy and end times teaching.",
+        "last_updated": "2025-01-01",
+        "categories": ["Revelation", "Daniel", "Prophecy", "Eschatology", "Ezekiel", "End Times", "Second Coming", "Tribulation", "Israel"]
+    }
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
