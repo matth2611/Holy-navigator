@@ -281,7 +281,109 @@ class HolyNavigatorAPITester:
         except Exception as e:
             self.log_result("Get Me (No Auth)", False, f"Exception: {str(e)}")
 
-    def test_subscription_endpoints(self):
+    def test_premium_media_library(self):
+        """Test media library endpoints with premium user"""
+        print("\n🎥 Testing Media Library (Premium User)...")
+        
+        # Login as premium user
+        premium_email = "premium@test.com"
+        premium_password = "test123"
+        
+        success, response = self.run_test(
+            "Premium User Login",
+            "POST",
+            "auth/login",
+            200,
+            data={
+                "email": premium_email,
+                "password": premium_password
+            }
+        )
+        
+        if not success or not response.get('token'):
+            self.log_result("Premium Media Test Setup", False, "Failed to login as premium user")
+            return
+        
+        # Store original token and set premium token
+        original_token = self.token
+        self.token = response['token']
+        
+        # Test if user is premium
+        success, user_data = self.run_test("Verify Premium Status", "GET", "auth/me", 200)
+        if success and user_data.get('is_premium'):
+            print(f"   Premium user verified: {user_data.get('email')}")
+        else:
+            self.log_result("Premium Status Check", False, "User is not premium")
+            self.token = original_token
+            return
+        
+        # Test media endpoints
+        success, videos_data = self.run_test("Get Video Sermons", "GET", "media/videos", 200)
+        if success and videos_data.get('videos'):
+            videos = videos_data['videos']
+            print(f"   Found {len(videos)} video sermons")
+            
+            # Verify video structure
+            if videos:
+                video = videos[0]
+                required_fields = ['id', 'title', 'preacher', 'description', 'duration', 'video_url']
+                missing_fields = [field for field in required_fields if field not in video]
+                if missing_fields:
+                    self.log_result("Video Structure Check", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_result("Video Structure Check", True)
+                    print(f"   Sample video: '{video.get('title')}' by {video.get('preacher')}")
+        
+        success, audio_data = self.run_test("Get Audio Sermons", "GET", "media/audio", 200)
+        if success and audio_data.get('audio'):
+            audio = audio_data['audio']
+            print(f"   Found {len(audio)} audio sermons")
+            
+            # Verify audio structure
+            if audio:
+                sermon = audio[0]
+                required_fields = ['id', 'title', 'preacher', 'description', 'duration', 'audio_url']
+                missing_fields = [field for field in required_fields if field not in sermon]
+                if missing_fields:
+                    self.log_result("Audio Structure Check", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_result("Audio Structure Check", True)
+                    print(f"   Sample audio: '{sermon.get('title')}' by {sermon.get('preacher')}")
+        
+        success, all_data = self.run_test("Get All Media", "GET", "media/all", 200)
+        if success:
+            videos = all_data.get('videos', [])
+            audio = all_data.get('audio', [])
+            notice = all_data.get('notice', '')
+            categories = all_data.get('categories', [])
+            
+            print(f"   All media: {len(videos)} videos, {len(audio)} audio")
+            
+            # Check for weekly update notice
+            if 'weekly' in notice.lower() or 'week' in notice.lower():
+                self.log_result("Weekly Update Notice", True)
+                print(f"   Notice: {notice}")
+            else:
+                self.log_result("Weekly Update Notice", False, f"Notice doesn't mention weekly updates: {notice}")
+            
+            # Check categories
+            expected_categories = ['Revelation', 'Daniel', 'Prophecy', 'Eschatology', 'End Times']
+            found_categories = [cat for cat in expected_categories if cat in categories]
+            if len(found_categories) >= 3:
+                self.log_result("End Times Categories", True)
+                print(f"   Categories: {', '.join(categories)}")
+            else:
+                self.log_result("End Times Categories", False, f"Missing end times categories. Found: {categories}")
+            
+            # Verify counts match individual endpoints
+            if len(videos) == 5 and len(audio) == 5:
+                self.log_result("Media Count Verification", True)
+                print("   ✓ 5 videos and 5 audio sermons as expected")
+            else:
+                self.log_result("Media Count Verification", False, f"Expected 5 videos and 5 audio, got {len(videos)} videos and {len(audio)} audio")
+        
+        # Restore original token
+        self.token = original_token
         """Test subscription-related endpoints"""
         print("\n💳 Testing Subscription Endpoints...")
         
