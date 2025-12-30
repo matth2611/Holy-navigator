@@ -241,15 +241,40 @@ class HolyNavigatorAPITester:
         """Test endpoints that require authentication without token"""
         print("\n🚫 Testing Unauthenticated Access...")
         
-        # Temporarily remove token
-        original_token = self.token
-        self.token = None
+        # Use fresh session without cookies for these tests
+        fresh_session = requests.Session()
         
-        self.run_test("Bookmarks (No Auth)", "GET", "bookmarks", 401)
-        self.run_test("Get Me (No Auth)", "GET", "auth/me", 401)
+        # Test bookmarks without auth
+        try:
+            url = f"{self.base_url}/bookmarks"
+            response = fresh_session.get(url, headers={'Content-Type': 'application/json'})
+            success = response.status_code == 401
+            details = f"Expected 401, got {response.status_code}"
+            if not success and response.text:
+                try:
+                    error_data = response.json()
+                    details += f" - {error_data.get('detail', response.text[:100])}"
+                except:
+                    details += f" - {response.text[:100]}"
+            self.log_result("Bookmarks (No Auth)", success, details if not success else "")
+        except Exception as e:
+            self.log_result("Bookmarks (No Auth)", False, f"Exception: {str(e)}")
         
-        # Restore token
-        self.token = original_token
+        # Test auth/me without auth
+        try:
+            url = f"{self.base_url}/auth/me"
+            response = fresh_session.get(url, headers={'Content-Type': 'application/json'})
+            success = response.status_code == 401
+            details = f"Expected 401, got {response.status_code}"
+            if not success and response.text:
+                try:
+                    error_data = response.json()
+                    details += f" - {error_data.get('detail', response.text[:100])}"
+                except:
+                    details += f" - {response.text[:100]}"
+            self.log_result("Get Me (No Auth)", success, details if not success else "")
+        except Exception as e:
+            self.log_result("Get Me (No Auth)", False, f"Exception: {str(e)}")
 
     def test_subscription_endpoints(self):
         """Test subscription-related endpoints"""
