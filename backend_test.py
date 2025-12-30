@@ -301,6 +301,88 @@ class HolyNavigatorAPITester:
             print(f"   User: {response.get('name', 'N/A')} ({response.get('email', 'N/A')})")
             print(f"   Premium: {response.get('is_premium', False)}")
 
+    def test_profile_endpoints(self):
+        """Test profile and reading progress endpoints"""
+        print("\n👤 Testing Profile Endpoints...")
+        
+        if not self.token:
+            self.log_result("Profile Test Setup", False, "No authentication token")
+            return
+        
+        # Test get profile
+        success, profile_data = self.run_test("Get Profile", "GET", "profile", 200)
+        if success:
+            stats = profile_data.get('stats', {})
+            settings = profile_data.get('settings', {})
+            
+            print(f"   User: {profile_data.get('name')} ({profile_data.get('email')})")
+            print(f"   Stats: {stats.get('bookmarks', 0)} bookmarks, {stats.get('journals', 0)} journals")
+            
+            # Check if stats structure is correct
+            expected_stats = ['bookmarks', 'journals', 'forum_posts']
+            missing_stats = [stat for stat in expected_stats if stat not in stats]
+            if missing_stats:
+                self.log_result("Profile Stats Structure", False, f"Missing stats: {missing_stats}")
+            else:
+                self.log_result("Profile Stats Structure", True)
+            
+            # Check settings structure
+            expected_settings = ['notification_email', 'notification_forum', 'preferred_translation', 'theme_preference']
+            missing_settings = [setting for setting in expected_settings if setting not in settings]
+            if missing_settings:
+                self.log_result("Profile Settings Structure", False, f"Missing settings: {missing_settings}")
+            else:
+                self.log_result("Profile Settings Structure", True)
+                print(f"   Settings: Translation={settings.get('preferred_translation')}, Theme={settings.get('theme_preference')}")
+        
+        # Test update profile
+        success, update_data = self.run_test(
+            "Update Profile",
+            "PUT",
+            "profile",
+            200,
+            data={
+                "name": "Updated Test User",
+                "notification_email": False,
+                "preferred_translation": "KJV",
+                "theme_preference": "dark"
+            }
+        )
+        if success:
+            print("   ✓ Profile update successful")
+        
+        # Test reading progress
+        success, progress_data = self.run_test("Get Reading Progress", "GET", "profile/reading-progress", 200)
+        if success:
+            books_started = progress_data.get('books_started', 0)
+            total_books = progress_data.get('total_books', 0)
+            chapters_bookmarked = progress_data.get('chapters_bookmarked', 0)
+            total_chapters = progress_data.get('total_chapters', 0)
+            progress_percentage = progress_data.get('progress_percentage', 0)
+            
+            print(f"   Reading Progress: {books_started}/{total_books} books, {chapters_bookmarked} chapters")
+            print(f"   Progress: {progress_percentage}% complete")
+            
+            # Check structure
+            expected_fields = ['books_started', 'total_books', 'chapters_bookmarked', 'total_chapters', 'progress_percentage']
+            missing_fields = [field for field in expected_fields if field not in progress_data]
+            if missing_fields:
+                self.log_result("Reading Progress Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("Reading Progress Structure", True)
+            
+            # Check if total books is 66 (standard Bible)
+            if total_books == 66:
+                self.log_result("Bible Books Count", True)
+            else:
+                self.log_result("Bible Books Count", False, f"Expected 66 books, got {total_books}")
+            
+            # Check if total chapters is reasonable (should be around 1189)
+            if 1100 <= total_chapters <= 1200:
+                self.log_result("Bible Chapters Count", True)
+            else:
+                self.log_result("Bible Chapters Count", False, f"Unexpected chapter count: {total_chapters}")
+
     def test_bookmarks_protected(self):
         """Test bookmark endpoints (requires auth)"""
         print("\n🔖 Testing Bookmark Endpoints...")
