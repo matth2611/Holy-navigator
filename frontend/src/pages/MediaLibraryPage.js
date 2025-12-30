@@ -100,6 +100,24 @@ const MediaLibraryPage = () => {
             <Bell className="w-5 h-5 text-[#C5A059]" />
             <span className="text-sm font-medium">{notice}</span>
           </div>
+          
+          {/* Progress Stats */}
+          {stats && (
+            <div className="mt-6 flex justify-center gap-8">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#0A2463] dark:text-[#C5A059]">
+                  {stats.watched_count}/{stats.total_videos}
+                </div>
+                <div className="text-sm text-muted-foreground">Videos Watched</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#0A2463] dark:text-[#C5A059]">
+                  {stats.listened_count}/{stats.total_audio}
+                </div>
+                <div className="text-sm text-muted-foreground">Audio Listened</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
