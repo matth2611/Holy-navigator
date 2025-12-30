@@ -384,6 +384,32 @@ class HolyNavigatorAPITester:
         
         # Restore original token
         self.token = original_token
+
+    def test_subscription_endpoints(self):
+        """Test subscription-related endpoints"""
+        print("\n💳 Testing Subscription Endpoints...")
+        
+        if not self.token:
+            self.log_result("Subscription Test Setup", False, "No authentication token")
+            return
+        
+        # Test creating checkout session
+        success, checkout_data = self.run_test(
+            "Create Checkout Session",
+            "POST",
+            "subscription/create-checkout",
+            200,
+            data={
+                "origin_url": "https://holy-navigator-1.preview.emergentagent.com"
+            }
+        )
+        
+        if success and checkout_data.get('session_id'):
+            session_id = checkout_data['session_id']
+            print(f"   Created checkout session: {session_id}")
+            
+            # Test getting subscription status
+            self.run_test("Get Subscription Status", "GET", f"subscription/status/{session_id}", 200)
         """Test subscription-related endpoints"""
         print("\n💳 Testing Subscription Endpoints...")
         
