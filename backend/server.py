@@ -719,9 +719,32 @@ async def search_dictionary(q: str):
 
 @api_router.get("/devotional/today")
 async def get_today_devotional():
+    from bible_data import FULL_YEAR_DEVOTIONALS
     # Get devotional based on day of year
     day_of_year = datetime.now(timezone.utc).timetuple().tm_yday
-    index = day_of_year % len(DAILY_DEVOTIONALS)
+    index = (day_of_year - 1) % len(FULL_YEAR_DEVOTIONALS)
+    devotional = FULL_YEAR_DEVOTIONALS[index]
+    return {**devotional, "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"), "day_of_year": day_of_year}
+
+@api_router.get("/devotional/all")
+async def get_all_devotionals(page: int = 1, limit: int = 30):
+    from bible_data import FULL_YEAR_DEVOTIONALS
+    start = (page - 1) * limit
+    end = start + limit
+    devotionals = FULL_YEAR_DEVOTIONALS[start:end]
+    return {
+        "devotionals": devotionals,
+        "total": len(FULL_YEAR_DEVOTIONALS),
+        "page": page,
+        "pages": (len(FULL_YEAR_DEVOTIONALS) + limit - 1) // limit
+    }
+
+@api_router.get("/devotional/{day}")
+async def get_devotional_by_day(day: int):
+    from bible_data import FULL_YEAR_DEVOTIONALS
+    if day < 1 or day > len(FULL_YEAR_DEVOTIONALS):
+        raise HTTPException(status_code=404, detail="Devotional not found for this day")
+    return FULL_YEAR_DEVOTIONALS[day - 1]
     devotional = DAILY_DEVOTIONALS[index]
     return {**devotional, "date": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
 
