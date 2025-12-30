@@ -20,6 +20,7 @@ import ForumPage from './pages/ForumPage';
 import JournalPage from './pages/JournalPage';
 import BookmarksPage from './pages/BookmarksPage';
 import PricingPage from './pages/PricingPage';
+import MediaLibraryPage from './pages/MediaLibraryPage';
 
 import './App.css';
 
@@ -72,6 +73,11 @@ const AppContent = () => {
           <Route path="/journal" element={
             <PremiumRoute>
               <JournalPage />
+            </PremiumRoute>
+          } />
+          <Route path="/media" element={
+            <PremiumRoute>
+              <MediaLibraryPage />
             </PremiumRoute>
           } />
           

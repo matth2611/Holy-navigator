@@ -26,7 +26,8 @@ import {
   Newspaper,
   Home,
   BookMarked,
-  Heart
+  Heart,
+  Video
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -41,6 +42,7 @@ const Navbar = () => {
     { path: '/devotional', label: 'Devotional', icon: Heart },
     { path: '/dictionary', label: 'Dictionary', icon: Search },
     { path: '/news-analysis', label: 'News Analysis', icon: Newspaper, premium: true },
+    { path: '/media', label: 'Sermons', icon: Video, premium: true },
     { path: '/forum', label: 'Community', icon: MessageSquare, premium: true },
     { path: '/journal', label: 'Journal', icon: PenLine, premium: true },
   ];
