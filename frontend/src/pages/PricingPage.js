@@ -148,6 +148,7 @@ const PricingPage = () => {
                 ))}
                 {[
                   'News-Scripture AI analysis',
+                  'End times sermon library',
                   'Community forum access',
                   'Personal journal',
                   'Ad-free experience',
@@ -181,6 +182,7 @@ const PricingPage = () => {
                 {[
                   'Everything in Free',
                   'News-Scripture AI analysis',
+                  'End times sermon library',
                   'Community forum access',
                   'Personal journal',
                   'Ad-free experience',
@@ -222,11 +224,15 @@ const PricingPage = () => {
           <h2 className="font-serif text-2xl font-bold text-center mb-12">
             Premium Features in Detail
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-4 gap-8">
             {[
               {
                 title: 'AI News Analysis',
                 description: 'Connect current events to biblical wisdom with our powerful AI that finds relevant scripture for any news story.',
+              },
+              {
+                title: 'Prophecy Sermons',
+                description: 'Access video and audio teachings on end times, biblical prophecy, and eschatology. Updated weekly with new content.',
               },
               {
                 title: 'Community Forum',
