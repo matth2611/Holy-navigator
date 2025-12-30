@@ -59,7 +59,7 @@ const RegisterPage = () => {
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0A2463] to-[#0F172A] flex items-center justify-center">
               <Compass className="w-6 h-6 text-[#C5A059]" />
             </div>
-            <span className="font-serif text-xl font-bold">Holy Navigator</span>
+            <span className="font-serif text-xl font-bold">Prophecy News Study Bible</span>
           </Link>
 
           <h1 className="font-serif text-3xl font-bold mb-2">Create Account</h1>

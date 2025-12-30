@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                 <Compass className="w-6 h-6 text-[#C5A059]" />
               </div>
-              <span className="font-serif text-xl font-bold">Prophecy News</span>
+              <span className="font-serif text-xl font-bold">Prophecy News Study Bible</span>
             </Link>
             <p className="text-white/70 text-sm leading-relaxed">
               Connecting current events to biblical prophecy and eternal truths through scripture and community.
@@ -78,14 +78,14 @@ const Footer = () => {
             <h4 className="font-serif text-lg font-semibold mb-4 text-[#C5A059]">Contact</h4>
             <div className="flex items-center gap-2 text-white/70 text-sm">
               <Mail className="w-4 h-4" />
-              support@prophecynews.com
+              support@prophecynewsstudybible.com
             </div>
           </div>
         </div>
 
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white/50 text-sm">
-            © {new Date().getFullYear()} Prophecy News. All rights reserved.
+            © {new Date().getFullYear()} Prophecy News Study Bible. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#privacy" className="text-white/50 hover:text-white text-sm transition-colors">
