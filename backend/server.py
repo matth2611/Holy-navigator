@@ -552,28 +552,150 @@ DAILY_DEVOTIONALS = [
 
 # ==================== BIBLE ENDPOINTS ====================
 
+# Book name mappings for Bible API
+BOOK_ABBREVIATIONS = {
+    "Genesis": "genesis", "Exodus": "exodus", "Leviticus": "leviticus",
+    "Numbers": "numbers", "Deuteronomy": "deuteronomy", "Joshua": "joshua",
+    "Judges": "judges", "Ruth": "ruth", "1 Samuel": "1samuel", "2 Samuel": "2samuel",
+    "1 Kings": "1kings", "2 Kings": "2kings", "1 Chronicles": "1chronicles",
+    "2 Chronicles": "2chronicles", "Ezra": "ezra", "Nehemiah": "nehemiah",
+    "Esther": "esther", "Job": "job", "Psalms": "psalms", "Proverbs": "proverbs",
+    "Ecclesiastes": "ecclesiastes", "Song of Solomon": "songofsolomon",
+    "Isaiah": "isaiah", "Jeremiah": "jeremiah", "Lamentations": "lamentations",
+    "Ezekiel": "ezekiel", "Daniel": "daniel", "Hosea": "hosea", "Joel": "joel",
+    "Amos": "amos", "Obadiah": "obadiah", "Jonah": "jonah", "Micah": "micah",
+    "Nahum": "nahum", "Habakkuk": "habakkuk", "Zephaniah": "zephaniah",
+    "Haggai": "haggai", "Zechariah": "zechariah", "Malachi": "malachi",
+    "Matthew": "matthew", "Mark": "mark", "Luke": "luke", "John": "john",
+    "Acts": "acts", "Romans": "romans", "1 Corinthians": "1corinthians",
+    "2 Corinthians": "2corinthians", "Galatians": "galatians", "Ephesians": "ephesians",
+    "Philippians": "philippians", "Colossians": "colossians",
+    "1 Thessalonians": "1thessalonians", "2 Thessalonians": "2thessalonians",
+    "1 Timothy": "1timothy", "2 Timothy": "2timothy", "Titus": "titus",
+    "Philemon": "philemon", "Hebrews": "hebrews", "James": "james",
+    "1 Peter": "1peter", "2 Peter": "2peter", "1 John": "1john",
+    "2 John": "2john", "3 John": "3john", "Jude": "jude", "Revelation": "revelation"
+}
+
 @api_router.get("/bible/books")
 async def get_bible_books():
     return {"books": BIBLE_BOOKS}
 
 @api_router.get("/bible/chapter/{book}/{chapter}")
 async def get_chapter(book: str, chapter: int):
+    # Try to fetch from Bible API
+    try:
+        book_abbr = BOOK_ABBREVIATIONS.get(book, book.lower().replace(" ", ""))
+        api_url = f"https://bible-api.com/{book_abbr}+{chapter}"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(api_url, timeout=10.0)
+            
+            if response.status_code == 200:
+                data = response.json()
+                verses = []
+                if "verses" in data:
+                    for v in data["verses"]:
+                        verses.append({
+                            "verse": v.get("verse", 1),
+                            "text": v.get("text", "").strip()
+                        })
+                return {
+                    "book": book,
+                    "chapter": chapter,
+                    "verses": verses,
+                    "translation": data.get("translation_name", "World English Bible")
+                }
+    except Exception as e:
+        logger.warning(f"Bible API error: {e}")
+    
+    # Fallback to local sample verses
     key = f"{book}_{chapter}"
     verses = SAMPLE_VERSES.get(key, [])
     
     if not verses:
-        # Generate placeholder verses for demo
-        verses = [{"verse": i, "text": f"Verse {i} of {book} chapter {chapter}. (Full text available in production)"} for i in range(1, 11)]
+        verses = [{"verse": i, "text": f"Verse {i} of {book} chapter {chapter}. (Loading...)"} for i in range(1, 11)]
     
     return {
         "book": book,
         "chapter": chapter,
-        "verses": verses
+        "verses": verses,
+        "translation": "King James Version"
     }
+
+@api_router.get("/bible/verse/{book}/{chapter}/{verse}")
+async def get_verse(book: str, chapter: int, verse: int):
+    try:
+        book_abbr = BOOK_ABBREVIATIONS.get(book, book.lower().replace(" ", ""))
+        api_url = f"https://bible-api.com/{book_abbr}+{chapter}:{verse}"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(api_url, timeout=10.0)
+            
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "book": book,
+                    "chapter": chapter,
+                    "verse": verse,
+                    "text": data.get("text", "").strip(),
+                    "reference": data.get("reference", f"{book} {chapter}:{verse}"),
+                    "translation": data.get("translation_name", "World English Bible")
+                }
+    except Exception as e:
+        logger.warning(f"Bible API error: {e}")
+    
+    return {
+        "book": book,
+        "chapter": chapter,
+        "verse": verse,
+        "text": f"Verse {verse} of {book} chapter {chapter}.",
+        "reference": f"{book} {chapter}:{verse}",
+        "translation": "King James Version"
+    }
+
+@api_router.get("/bible/search/verses")
+async def search_verses(q: str, limit: int = 20):
+    """Search Bible verses using the Bible API"""
+    results = []
+    try:
+        # Search common books for the query
+        search_books = ["psalms", "proverbs", "john", "romans", "matthew", "genesis", "isaiah"]
+        
+        async with httpx.AsyncClient() as client:
+            for book in search_books[:3]:  # Limit to 3 books for speed
+                try:
+                    # Search a few chapters
+                    for ch in range(1, 4):
+                        api_url = f"https://bible-api.com/{book}+{ch}"
+                        response = await client.get(api_url, timeout=5.0)
+                        
+                        if response.status_code == 200:
+                            data = response.json()
+                            if "verses" in data:
+                                for v in data["verses"]:
+                                    text = v.get("text", "").lower()
+                                    if q.lower() in text:
+                                        results.append({
+                                            "reference": f"{book.title()} {ch}:{v.get('verse', 1)}",
+                                            "text": v.get("text", "").strip(),
+                                            "book": book.title(),
+                                            "chapter": ch,
+                                            "verse": v.get("verse", 1)
+                                        })
+                                        if len(results) >= limit:
+                                            return {"results": results, "query": q}
+                except:
+                    continue
+    except Exception as e:
+        logger.warning(f"Search error: {e}")
+    
+    return {"results": results, "query": q}
 
 @api_router.get("/bible/dictionary")
 async def get_dictionary():
-    return {"words": list(BIBLE_DICTIONARY.values())}
+    from bible_data import EXTENDED_BIBLE_DICTIONARY
+    return {"words": list(EXTENDED_BIBLE_DICTIONARY.values())}
 
 @api_router.get("/bible/dictionary/{word}")
 async def get_dictionary_word(word: str):
