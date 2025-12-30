@@ -21,6 +21,7 @@ import JournalPage from './pages/JournalPage';
 import BookmarksPage from './pages/BookmarksPage';
 import PricingPage from './pages/PricingPage';
 import MediaLibraryPage from './pages/MediaLibraryPage';
+import ProfilePage from './pages/ProfilePage';
 
 import './App.css';
 
@@ -56,6 +57,11 @@ const AppContent = () => {
           <Route path="/bookmarks" element={
             <ProtectedRoute>
               <BookmarksPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           } />
           
