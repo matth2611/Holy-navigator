@@ -1502,13 +1502,139 @@ async def get_audio_sermons(request: Request):
 @api_router.get("/media/all")
 async def get_all_media(request: Request):
     user = await get_premium_user(request)
+    
+    # Get user's watched/listened history
+    watched_history = await db.media_history.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).to_list(100)
+    
+    watched_ids = {h["media_id"] for h in watched_history}
+    
+    # Add watched status to videos and audio
+    videos_with_status = [
+        {**v, "watched": v["id"] in watched_ids}
+        for v in VIDEO_SERMONS
+    ]
+    audio_with_status = [
+        {**a, "listened": a["id"] in watched_ids}
+        for a in AUDIO_SERMONS
+    ]
+    
     return {
-        "videos": VIDEO_SERMONS,
-        "audio": AUDIO_SERMONS,
+        "videos": videos_with_status,
+        "audio": audio_with_status,
         "notice": "New sermons are added every week. Check back regularly for fresh content on biblical prophecy and end times teaching.",
         "last_updated": "2025-01-01",
-        "categories": ["Revelation", "Daniel", "Prophecy", "Eschatology", "Ezekiel", "End Times", "Second Coming", "Tribulation", "Israel"]
+        "categories": ["Revelation", "Daniel", "Prophecy", "Eschatology", "Ezekiel", "End Times", "Second Coming", "Tribulation", "Israel"],
+        "stats": {
+            "total_videos": len(VIDEO_SERMONS),
+            "total_audio": len(AUDIO_SERMONS),
+            "watched_count": len([v for v in videos_with_status if v["watched"]]),
+            "listened_count": len([a for a in audio_with_status if a["listened"]])
+        }
     }
+
+# ==================== MEDIA TRACKING ====================
+
+@api_router.post("/media/track/{media_id}")
+async def track_media(media_id: str, request: Request):
+    """Mark a video/audio as watched/listened"""
+    user = await get_premium_user(request)
+    
+    # Check if already tracked
+    existing = await db.media_history.find_one({
+        "user_id": user["user_id"],
+        "media_id": media_id
+    })
+    
+    if existing:
+        return {"message": "Already tracked", "media_id": media_id}
+    
+    # Add to history
+    await db.media_history.insert_one({
+        "user_id": user["user_id"],
+        "media_id": media_id,
+        "watched_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {"message": "Media tracked successfully", "media_id": media_id}
+
+@api_router.delete("/media/track/{media_id}")
+async def untrack_media(media_id: str, request: Request):
+    """Unmark a video/audio as watched/listened"""
+    user = await get_premium_user(request)
+    
+    result = await db.media_history.delete_one({
+        "user_id": user["user_id"],
+        "media_id": media_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Media was not tracked")
+    
+    return {"message": "Media untracked", "media_id": media_id}
+
+@api_router.get("/media/history")
+async def get_media_history(request: Request):
+    """Get user's media watch/listen history"""
+    user = await get_premium_user(request)
+    
+    history = await db.media_history.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).sort("watched_at", -1).to_list(100)
+    
+    return {"history": history}
+
+# ==================== NOTIFICATION PREFERENCES ====================
+
+class NotificationPreferences(BaseModel):
+    daily_devotional: bool = True
+    reading_plan_reminder: bool = True
+    weekly_sermon_updates: bool = True
+    reminder_time: Optional[str] = "08:00"  # HH:MM format
+
+@api_router.get("/notifications/preferences")
+async def get_notification_preferences(request: Request):
+    """Get user's notification preferences"""
+    user = await get_current_user(request)
+    
+    prefs = await db.notification_preferences.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    )
+    
+    if not prefs:
+        # Return defaults
+        prefs = {
+            "user_id": user["user_id"],
+            "daily_devotional": True,
+            "reading_plan_reminder": True,
+            "weekly_sermon_updates": True,
+            "reminder_time": "08:00"
+        }
+    
+    return prefs
+
+@api_router.put("/notifications/preferences")
+async def update_notification_preferences(prefs: NotificationPreferences, request: Request):
+    """Update user's notification preferences"""
+    user = await get_current_user(request)
+    
+    await db.notification_preferences.update_one(
+        {"user_id": user["user_id"]},
+        {"$set": {
+            "daily_devotional": prefs.daily_devotional,
+            "reading_plan_reminder": prefs.reading_plan_reminder,
+            "weekly_sermon_updates": prefs.weekly_sermon_updates,
+            "reminder_time": prefs.reminder_time,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"message": "Notification preferences updated"}
 
 # ==================== HEALTH CHECK ====================
 
