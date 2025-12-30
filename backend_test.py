@@ -333,7 +333,16 @@ class ProphecyNewsStudyBibleAPITester:
         # Test another specific day
         success, day_data = self.run_test("Get Day 100 Reading", "GET", "reading-plan/day/100", 200)
         if success and day_data:
-            print(f"   Day 100: {day_data.get('theme', 'No theme')} - {', '.join(day_data.get('readings', []))}")
+            readings = day_data.get('readings', [])
+            reading_strs = []
+            for reading in readings:
+                if isinstance(reading, dict):
+                    book = reading.get('book', '')
+                    chapters = reading.get('chapters', '')
+                    reading_strs.append(f"{book} {chapters}")
+                else:
+                    reading_strs.append(str(reading))
+            print(f"   Day 100: {day_data.get('theme', 'No theme')} - {', '.join(reading_strs)}")
         
         # Test invalid day
         self.run_test("Invalid Day Reading (400)", "GET", "reading-plan/day/400", 404)
