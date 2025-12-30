@@ -101,3 +101,114 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build Prophecy News Study Bible - a web application connecting current news events to biblical scripture, with Bible reader, dictionary, devotionals, community forum, journaling, Bible in a Year reading plan, and premium subscriptions."
+
+backend:
+  - task: "API health and naming"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "API returns 'Prophecy News Study Bible API' correctly"
+
+  - task: "Reading Plan API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/reading-plan/today returns Day 364 with correct readings. All CRUD endpoints working."
+
+  - task: "Bible chapter API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "John 3:16 returns correct text 'For God so loved the world...'"
+
+frontend:
+  - task: "App renaming to Prophecy News Study Bible"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Navbar.js, LoginPage.js, RegisterPage.js, Footer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "All instances of 'Holy Navigator' and 'Prophecy News' updated to 'Prophecy News Study Bible'"
+
+  - task: "Reading Plan Page UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ReadingPlanPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Page displays Day 364, Today's Readings (Ephesians, Isaiah), Full Calendar toggle working"
+
+  - task: "Reading Plan navigation link"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Navbar.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Bible in a Year link added to navbar with Calendar icon"
+
+  - task: "Bible verse display (John 3:16)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/BiblePage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Previous report mentioned John 3:16 displaying wrong content"
+      - working: true
+        agent: "main"
+        comment: "Verified John 3:16 displays correctly: 'For God so loved the world...'"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 4
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "App renaming to Prophecy News Study Bible"
+    - "Reading Plan Page UI"
+    - "Reading Plan API endpoints"
+    - "User progress tracking for Reading Plan"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Completed app rename from Holy Navigator to Prophecy News Study Bible. Added Reading Plan route to App.js and navigation link to Navbar. All API endpoints verified working. John 3:16 bug appears to be already fixed. Please test: 1) Reading Plan flow (view today, mark complete, view calendar), 2) User authentication and progress tracking, 3) Navigation across all pages with new branding."
