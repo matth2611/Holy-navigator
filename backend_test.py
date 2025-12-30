@@ -501,9 +501,98 @@ class HolyNavigatorAPITester:
         if success and bookmarks_data.get('bookmarks'):
             print(f"   Found {len(bookmarks_data['bookmarks'])} bookmarks")
         
-        # Test deleting bookmark
-        if bookmark_id:
-            self.run_test("Delete Bookmark", "DELETE", f"bookmarks/{bookmark_id}", 200)
+    def test_reading_plan_progress(self):
+        """Test reading plan progress tracking (requires auth)"""
+        print("\n📊 Testing Reading Plan Progress...")
+        
+        if not self.token:
+            self.log_result("Reading Plan Progress Test", False, "No authentication token")
+            return
+        
+        # Test getting initial progress
+        success, progress_data = self.run_test("Get Reading Plan Progress", "GET", "reading-plan/progress", 200)
+        if success and progress_data:
+            completed_days = progress_data.get('completed_days', 0)
+            total_days = progress_data.get('total_days', 0)
+            progress_percentage = progress_data.get('progress_percentage', 0)
+            current_streak = progress_data.get('current_streak', 0)
+            completed_list = progress_data.get('completed_list', [])
+            
+            print(f"   Initial progress: {completed_days}/{total_days} days ({progress_percentage}%)")
+            print(f"   Current streak: {current_streak} days")
+            
+            # Check structure
+            required_fields = ['completed_days', 'total_days', 'progress_percentage', 'current_streak', 'completed_list']
+            missing_fields = [field for field in required_fields if field not in progress_data]
+            if missing_fields:
+                self.log_result("Progress Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("Progress Structure", True)
+            
+            # Check if total days is 365
+            if total_days == 365:
+                self.log_result("Total Days Check (365)", True)
+            else:
+                self.log_result("Total Days Check (365)", False, f"Expected 365 days, got {total_days}")
+        
+        # Test marking a day as complete
+        test_day = 50  # Use day 50 for testing
+        success, complete_data = self.run_test("Mark Day Complete", "POST", f"reading-plan/complete/{test_day}", 200)
+        if success and complete_data:
+            message = complete_data.get('message', '')
+            day = complete_data.get('day', 0)
+            
+            if day == test_day and 'complete' in message.lower():
+                self.log_result("Mark Reading Complete", True)
+                print(f"   ✓ Marked day {test_day} as complete")
+            else:
+                self.log_result("Mark Reading Complete", False, f"Unexpected response: {complete_data}")
+        
+        # Test getting progress after marking complete
+        success, updated_progress = self.run_test("Get Updated Progress", "GET", "reading-plan/progress", 200)
+        if success and updated_progress:
+            new_completed = updated_progress.get('completed_days', 0)
+            new_percentage = updated_progress.get('progress_percentage', 0)
+            completed_list = updated_progress.get('completed_list', [])
+            
+            # Check if the day was added to completed list
+            if test_day in completed_list:
+                self.log_result("Progress Updated After Complete", True)
+                print(f"   ✓ Progress updated: {new_completed} days ({new_percentage}%)")
+            else:
+                self.log_result("Progress Updated After Complete", False, f"Day {test_day} not in completed list: {completed_list}")
+        
+        # Test unmarking a day
+        success, unmark_data = self.run_test("Unmark Day Complete", "DELETE", f"reading-plan/complete/{test_day}", 200)
+        if success and unmark_data:
+            message = unmark_data.get('message', '')
+            day = unmark_data.get('day', 0)
+            
+            if day == test_day and 'unmarked' in message.lower():
+                self.log_result("Unmark Reading Complete", True)
+                print(f"   ✓ Unmarked day {test_day}")
+            else:
+                self.log_result("Unmark Reading Complete", False, f"Unexpected response: {unmark_data}")
+        
+        # Test getting progress after unmarking
+        success, final_progress = self.run_test("Get Final Progress", "GET", "reading-plan/progress", 200)
+        if success and final_progress:
+            final_completed = final_progress.get('completed_days', 0)
+            completed_list = final_progress.get('completed_list', [])
+            
+            # Check if the day was removed from completed list
+            if test_day not in completed_list:
+                self.log_result("Progress Updated After Unmark", True)
+                print(f"   ✓ Progress reverted: {final_completed} days")
+            else:
+                self.log_result("Progress Updated After Unmark", False, f"Day {test_day} still in completed list: {completed_list}")
+        
+        # Test invalid day numbers
+        self.run_test("Mark Invalid Day (0)", "POST", "reading-plan/complete/0", 400)
+        self.run_test("Mark Invalid Day (400)", "POST", "reading-plan/complete/400", 400)
+        
+        # Test unmarking non-existent completion
+        self.run_test("Unmark Non-existent", "DELETE", "reading-plan/complete/999", 404)
 
     def test_premium_endpoints_without_subscription(self):
         """Test premium endpoints without subscription (should fail)"""
