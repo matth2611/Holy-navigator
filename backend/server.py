@@ -1255,6 +1255,115 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {str(e)}")
         return JSONResponse(status_code=400, content={"error": str(e)})
 
+# ==================== READING PLAN ENDPOINTS ====================
+
+@api_router.get("/reading-plan")
+async def get_reading_plan(page: int = 1, limit: int = 30):
+    """Get the Bible in a Year reading plan"""
+    from reading_plan import BIBLE_IN_A_YEAR_PLAN
+    start = (page - 1) * limit
+    end = start + limit
+    readings = BIBLE_IN_A_YEAR_PLAN[start:end]
+    return {
+        "readings": readings,
+        "total": len(BIBLE_IN_A_YEAR_PLAN),
+        "page": page,
+        "pages": (len(BIBLE_IN_A_YEAR_PLAN) + limit - 1) // limit,
+        "description": "Read through the entire Bible in one year with daily Old and New Testament readings"
+    }
+
+@api_router.get("/reading-plan/today")
+async def get_today_reading():
+    """Get today's reading from the Bible in a Year plan"""
+    from reading_plan import get_today_reading
+    reading = get_today_reading()
+    day_of_year = datetime.now(timezone.utc).timetuple().tm_yday
+    return {
+        **reading,
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "day_of_year": day_of_year
+    }
+
+@api_router.get("/reading-plan/day/{day}")
+async def get_reading_by_day(day: int):
+    """Get reading for a specific day"""
+    from reading_plan import get_reading_by_day
+    reading = get_reading_by_day(day)
+    if not reading:
+        raise HTTPException(status_code=404, detail="Reading not found for this day")
+    return reading
+
+@api_router.get("/reading-plan/progress")
+async def get_reading_progress(request: Request):
+    """Get user's reading plan progress"""
+    user = await get_current_user(request)
+    
+    # Get completed readings
+    completed = await db.reading_progress.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).to_list(400)
+    
+    completed_days = set(r["day"] for r in completed)
+    current_streak = 0
+    
+    # Calculate streak
+    today = datetime.now(timezone.utc).timetuple().tm_yday
+    for i in range(today, 0, -1):
+        if i in completed_days:
+            current_streak += 1
+        else:
+            break
+    
+    return {
+        "completed_days": len(completed_days),
+        "total_days": 365,
+        "progress_percentage": round((len(completed_days) / 365) * 100, 1),
+        "current_streak": current_streak,
+        "completed_list": sorted(list(completed_days))
+    }
+
+@api_router.post("/reading-plan/complete/{day}")
+async def mark_reading_complete(day: int, request: Request):
+    """Mark a day's reading as complete"""
+    user = await get_current_user(request)
+    
+    if day < 1 or day > 365:
+        raise HTTPException(status_code=400, detail="Invalid day number")
+    
+    # Check if already completed
+    existing = await db.reading_progress.find_one({
+        "user_id": user["user_id"],
+        "day": day
+    })
+    
+    if existing:
+        return {"message": "Already completed", "day": day}
+    
+    # Mark as complete
+    await db.reading_progress.insert_one({
+        "user_id": user["user_id"],
+        "day": day,
+        "completed_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {"message": "Reading marked as complete", "day": day}
+
+@api_router.delete("/reading-plan/complete/{day}")
+async def unmark_reading_complete(day: int, request: Request):
+    """Unmark a day's reading as complete"""
+    user = await get_current_user(request)
+    
+    result = await db.reading_progress.delete_one({
+        "user_id": user["user_id"],
+        "day": day
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Reading was not marked as complete")
+    
+    return {"message": "Reading unmarked", "day": day}
+
 # ==================== MEDIA LIBRARY (PREMIUM) ====================
 
 # Video sermons - Using public domain/freely licensed content about end times prophecy
