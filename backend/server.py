@@ -699,7 +699,8 @@ async def create_post(post: ForumPostCreate, request: Request):
     return ForumPostResponse(**{k: v for k, v in post_doc.items() if k != "upvoted_by"})
 
 @api_router.get("/forum/posts")
-async def get_posts(skip: int = 0, limit: int = 20):
+async def get_posts(request: Request, skip: int = 0, limit: int = 20):
+    user = await get_premium_user(request)
     posts = await db.forum_posts.find(
         {},
         {"_id": 0, "upvoted_by": 0}
