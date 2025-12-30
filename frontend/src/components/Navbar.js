@@ -27,7 +27,8 @@ import {
   Home,
   BookMarked,
   Heart,
-  Video
+  Video,
+  Calendar
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -39,6 +40,7 @@ const Navbar = () => {
 
   const navLinks = [
     { path: '/bible', label: 'Bible', icon: BookOpen },
+    { path: '/reading-plan', label: 'Bible in a Year', icon: Calendar },
     { path: '/devotional', label: 'Devotional', icon: Heart },
     { path: '/dictionary', label: 'Dictionary', icon: Search },
     { path: '/news-analysis', label: 'News Analysis', icon: Newspaper, premium: true },
