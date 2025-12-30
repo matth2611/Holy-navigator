@@ -11,7 +11,8 @@ import {
   Crown,
   ArrowRight,
   Check,
-  Compass
+  Compass,
+  Video
 } from 'lucide-react';
 
 const LandingPage = () => {
@@ -38,6 +39,12 @@ const LandingPage = () => {
       icon: Newspaper,
       title: 'News-Scripture Analysis',
       description: 'AI-powered analysis connecting current events to biblical scripture.',
+      free: false
+    },
+    {
+      icon: Video,
+      title: 'End Times Sermons',
+      description: 'Video and audio library on biblical prophecy, updated weekly with new content.',
       free: false
     },
     {
@@ -242,6 +249,7 @@ const LandingPage = () => {
                 {[
                   'Everything in Free',
                   'News-Scripture AI analysis',
+                  'End times sermon library',
                   'Community forum access',
                   'Personal journal',
                   'Ad-free experience'
