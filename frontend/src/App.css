@@ -1,34 +1,45 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* App-specific styles */
+.App {
+  min-height: 100vh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Bible reader styles */
+.verse-text {
+  @apply font-serif text-lg leading-loose;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.verse-number {
+  @apply text-sm font-sans text-muted-foreground align-super mr-1;
 }
 
-.App-link {
-    color: #61dafb;
+/* Forum styles */
+.forum-post {
+  @apply bg-card border border-border/40 rounded-2xl p-6 transition-all duration-300 hover:shadow-md;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Journal styles */
+.journal-entry {
+  @apply bg-card border border-border/40 rounded-2xl p-6;
+}
+
+/* News analysis card */
+.analysis-card {
+  @apply bg-card border border-border/40 rounded-2xl overflow-hidden;
+}
+
+/* Premium feature overlay */
+.premium-overlay {
+  @apply absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl;
+}
+
+/* Loading states */
+.skeleton-pulse {
+  @apply animate-pulse bg-muted rounded;
+}
+
+/* Mobile nav */
+@media (max-width: 768px) {
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border z-50;
+  }
 }
