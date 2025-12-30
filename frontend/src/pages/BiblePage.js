@@ -3,7 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { ScrollArea } from '../components/ui/scroll-area';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../components/ui/dialog';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -11,7 +19,9 @@ import {
   Bookmark,
   BookMarked,
   Menu,
-  X
+  X,
+  Search,
+  Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -26,9 +36,16 @@ const BiblePage = () => {
   const [currentBook, setCurrentBook] = useState(book || 'Genesis');
   const [currentChapter, setCurrentChapter] = useState(parseInt(chapter) || 1);
   const [verses, setVerses] = useState([]);
+  const [translation, setTranslation] = useState('');
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
+  
+  // Search state
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     fetchBooks();
