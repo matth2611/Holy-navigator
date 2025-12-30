@@ -752,6 +752,102 @@ async def get_devotional_by_day(day: int):
 async def get_all_devotionals():
     return {"devotionals": DAILY_DEVOTIONALS}
 
+# ==================== PROFILE ENDPOINTS ====================
+
+@api_router.get("/profile")
+async def get_profile(request: Request):
+    user = await get_current_user(request)
+    
+    # Get user stats
+    bookmarks_count = await db.bookmarks.count_documents({"user_id": user["user_id"]})
+    journals_count = await db.journals.count_documents({"user_id": user["user_id"]})
+    posts_count = await db.forum_posts.count_documents({"user_id": user["user_id"]})
+    
+    # Get user settings
+    settings = await db.user_settings.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    
+    return {
+        "user_id": user["user_id"],
+        "email": user["email"],
+        "name": user["name"],
+        "picture": user.get("picture"),
+        "is_premium": user.get("is_premium", False),
+        "premium_since": user.get("premium_since"),
+        "created_at": user.get("created_at"),
+        "stats": {
+            "bookmarks": bookmarks_count,
+            "journals": journals_count,
+            "forum_posts": posts_count
+        },
+        "settings": settings or {
+            "notification_email": True,
+            "notification_forum": True,
+            "preferred_translation": "WEB",
+            "theme_preference": "system"
+        }
+    }
+
+@api_router.put("/profile")
+async def update_profile(update_data: UserProfileUpdate, request: Request):
+    user = await get_current_user(request)
+    
+    updates = {}
+    if update_data.name:
+        updates["name"] = update_data.name
+        await db.users.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {"name": update_data.name}}
+        )
+    
+    # Update settings
+    settings_updates = {}
+    if update_data.notification_email is not None:
+        settings_updates["notification_email"] = update_data.notification_email
+    if update_data.notification_forum is not None:
+        settings_updates["notification_forum"] = update_data.notification_forum
+    if update_data.preferred_translation:
+        settings_updates["preferred_translation"] = update_data.preferred_translation
+    if update_data.theme_preference:
+        settings_updates["theme_preference"] = update_data.theme_preference
+    
+    if settings_updates:
+        await db.user_settings.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": settings_updates},
+            upsert=True
+        )
+    
+    return {"message": "Profile updated successfully"}
+
+@api_router.get("/profile/reading-progress")
+async def get_reading_progress(request: Request):
+    user = await get_current_user(request)
+    
+    # Get all bookmarks to calculate progress
+    bookmarks = await db.bookmarks.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    # Calculate books and chapters read
+    books_read = set()
+    chapters_read = set()
+    for bm in bookmarks:
+        books_read.add(bm["book"])
+        chapters_read.add(f"{bm['book']}_{bm['chapter']}")
+    
+    # Total chapters in Bible
+    total_chapters = sum(book["chapters"] for book in BIBLE_BOOKS)
+    
+    return {
+        "books_started": len(books_read),
+        "total_books": 66,
+        "chapters_bookmarked": len(chapters_read),
+        "total_chapters": total_chapters,
+        "progress_percentage": round((len(chapters_read) / total_chapters) * 100, 1),
+        "recent_bookmarks": bookmarks[:5]
+    }
+
 # ==================== BOOKMARK ENDPOINTS ====================
 
 @api_router.post("/bookmarks", response_model=BookmarkResponse)
