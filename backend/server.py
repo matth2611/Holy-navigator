@@ -1514,7 +1514,7 @@ async def get_all_media(request: Request):
 
 @api_router.get("/")
 async def root():
-    return {"message": "Prophecy News API", "version": "1.0.0"}
+    return {"message": "Prophecy News Study Bible API", "version": "1.0.0"}
 
 @api_router.get("/health")
 async def health_check():
