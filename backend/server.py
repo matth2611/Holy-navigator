@@ -699,16 +699,18 @@ async def get_dictionary():
 
 @api_router.get("/bible/dictionary/{word}")
 async def get_dictionary_word(word: str):
+    from bible_data import EXTENDED_BIBLE_DICTIONARY
     word_lower = word.lower()
-    if word_lower in BIBLE_DICTIONARY:
-        return BIBLE_DICTIONARY[word_lower]
+    if word_lower in EXTENDED_BIBLE_DICTIONARY:
+        return EXTENDED_BIBLE_DICTIONARY[word_lower]
     raise HTTPException(status_code=404, detail="Word not found in dictionary")
 
 @api_router.get("/bible/search")
 async def search_dictionary(q: str):
+    from bible_data import EXTENDED_BIBLE_DICTIONARY
     results = []
     q_lower = q.lower()
-    for key, entry in BIBLE_DICTIONARY.items():
+    for key, entry in EXTENDED_BIBLE_DICTIONARY.items():
         if q_lower in key or q_lower in entry["definition"].lower():
             results.append(entry)
     return {"results": results}
