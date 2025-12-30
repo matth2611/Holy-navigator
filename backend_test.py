@@ -7,7 +7,7 @@ from datetime import datetime
 import uuid
 
 class HolyNavigatorAPITester:
-    def __init__(self, base_url="https://holy-navigator-1.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://prophecy-news.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
         self.user_id = None
@@ -600,7 +600,7 @@ class HolyNavigatorAPITester:
             "subscription/create-checkout",
             200,
             data={
-                "origin_url": "https://holy-navigator-1.preview.emergentagent.com"
+                "origin_url": "https://prophecy-news.preview.emergentagent.com"
             }
         )
         
