@@ -336,7 +336,7 @@ class HolyNavigatorAPITester:
                 print(f"   Settings: Translation={settings.get('preferred_translation')}, Theme={settings.get('theme_preference')}")
         
         # Test update profile
-        success, update_data = self.run_test(
+        success, update_response = self.run_test(
             "Update Profile",
             "PUT",
             "profile",
