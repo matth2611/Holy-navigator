@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 import uuid
 
-class HolyNavigatorAPITester:
+class ProphecyNewsStudyBibleAPITester:
     def __init__(self, base_url="https://prophecy-news.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
