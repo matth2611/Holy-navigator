@@ -72,7 +72,17 @@ class HolyNavigatorAPITester:
     def test_health_endpoints(self):
         """Test basic health endpoints"""
         print("\n🔍 Testing Health Endpoints...")
-        self.run_test("API Root", "GET", "", 200)
+        
+        # Test API root returns correct branding
+        success, root_data = self.run_test("API Root", "GET", "", 200)
+        if success and root_data.get('message'):
+            message = root_data['message']
+            if 'Prophecy News Study Bible API' in message:
+                self.log_result("API Branding Check", True)
+                print(f"   ✓ API returns correct branding: {message}")
+            else:
+                self.log_result("API Branding Check", False, f"Expected 'Prophecy News Study Bible API', got: {message}")
+        
         self.run_test("Health Check", "GET", "health", 200)
 
     def test_bible_endpoints(self):
