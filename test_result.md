@@ -240,3 +240,67 @@ agent_communication:
     message: "Completed app rename from Holy Navigator to Prophecy News Study Bible. Added Reading Plan route to App.js and navigation link to Navbar. All API endpoints verified working. John 3:16 bug appears to be already fixed. Please test: 1) Reading Plan flow (view today, mark complete, view calendar), 2) User authentication and progress tracking, 3) Navigation across all pages with new branding."
   - agent: "testing"
     message: "✅ COMPREHENSIVE BACKEND TESTING COMPLETED - ALL SYSTEMS OPERATIONAL: Tested 90 endpoints with 100% success rate. Key findings: 1) API correctly returns 'Prophecy News Study Bible API' branding ✅ 2) Bible API working - John 3:16 returns correct text 'For God so loved the world...' ✅ 3) Reading Plan endpoints fully functional - today's reading (Day 364), pagination (365 total readings), specific day lookup ✅ 4) User progress tracking complete - mark/unmark days, progress percentage, streak calculation ✅ 5) Authentication, bookmarks, premium features, media library all working ✅. All backend APIs are ready to support frontend functionality. No critical issues found."
+  - agent: "main"
+    message: "Implemented upcoming tasks: 1) Updated audio URLs to use real Internet Archive audio files, 2) Added sermon tracking feature - users can mark videos/audio as watched/listened with stats display, 3) Added notification preferences API and UI with daily devotional, reading plan, and weekly sermon reminders, 4) News-Scripture analysis was already implemented with Emergent LLM Key (GPT-5.2). All features tested via curl and working. Please run comprehensive frontend and backend tests."
+
+backend:
+  - task: "Media tracking API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "POST/DELETE /api/media/track/{media_id} endpoints working. GET /api/media/all returns watched/listened status and stats."
+
+  - task: "Notification preferences API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET/PUT /api/notifications/preferences endpoints working. Stores daily_devotional, reading_plan_reminder, weekly_sermon_updates, reminder_time."
+
+  - task: "News-Scripture Analysis with LLM"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "POST /api/analyze/news uses Emergent LLM Key with GPT-5.2 for scripture-news analysis. Already implemented."
+
+frontend:
+  - task: "Media Library with tracking"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/MediaLibraryPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added watched/listened indicators, track buttons, progress stats display (X/5 Videos Watched, X/5 Audio Listened)"
+
+  - task: "Profile page notification preferences"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ProfilePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added notification toggles for Daily Devotional, Reading Plan Reminder, Weekly Sermon Updates, and Reminder Time selector"
