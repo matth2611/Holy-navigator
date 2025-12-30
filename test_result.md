@@ -146,6 +146,9 @@ backend:
       - working: true
         agent: "main"
         comment: "John 3:16 returns correct text 'For God so loved the world...'"
+      - working: true
+        agent: "testing"
+        comment: "✅ BIBLE API VERIFIED: GET /api/bible/chapter/John/3 returns verse 16 with correct text 'For God so loved the world, that he gave his one and only Son, that whoever believes in him should not perish, but have everlasting life.' Single verse API GET /api/bible/verse/John/3/16 also working correctly. Bible search functionality operational."
 
 frontend:
   - task: "App renaming to Prophecy News Study Bible"
