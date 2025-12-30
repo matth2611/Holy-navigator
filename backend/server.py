@@ -127,6 +127,17 @@ class NewsAnalysisResponse(BaseModel):
 class SubscriptionCreate(BaseModel):
     origin_url: str
 
+class UserProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    notification_email: Optional[bool] = None
+    notification_forum: Optional[bool] = None
+    preferred_translation: Optional[str] = None
+    theme_preference: Optional[str] = None
+
+class SearchRequest(BaseModel):
+    query: str
+    search_type: Optional[str] = "all"  # all, verses, dictionary
+
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
