@@ -811,6 +811,504 @@ class ProphecyNewsStudyBibleAPITester:
             # Test getting subscription status
             self.run_test("Get Subscription Status", "GET", f"subscription/status/{session_id}", 200)
 
+    def create_premium_user(self):
+        """Create a premium user for testing premium features"""
+        print("\n👑 Creating Premium User...")
+        
+        # Generate unique premium test user
+        timestamp = datetime.now().strftime("%H%M%S")
+        premium_email = f"premium_user_{timestamp}@example.com"
+        premium_password = "PremiumPass123!"
+        premium_name = f"Premium User {timestamp}"
+        
+        # Register user first
+        success, response = self.run_test(
+            "Premium User Registration",
+            "POST",
+            "auth/register",
+            200,
+            data={
+                "email": premium_email,
+                "password": premium_password,
+                "name": premium_name
+            }
+        )
+        
+        if success and response.get('token'):
+            premium_token = response['token']
+            premium_user_id = response.get('user_id')
+            print(f"   Registered premium user: {premium_email}")
+            
+            # Now we need to manually set is_premium=True in MongoDB
+            # Since we can't directly access MongoDB from here, we'll use the existing premium user
+            # or create a workaround
+            return premium_email, premium_password, premium_token, premium_user_id
+        
+        return None, None, None, None
+
+    def test_media_tracking_api(self):
+        """Test Media Tracking API (Premium feature)"""
+        print("\n🎬 Testing Media Tracking API (Premium Feature)...")
+        
+        # Try to use existing premium user credentials
+        premium_email = "premium@test.com"
+        premium_password = "test123"
+        
+        # Login as premium user
+        success, response = self.run_test(
+            "Premium User Login for Media Tracking",
+            "POST",
+            "auth/login",
+            200,
+            data={
+                "email": premium_email,
+                "password": premium_password
+            }
+        )
+        
+        if not success or not response.get('token'):
+            self.log_result("Media Tracking Test Setup", False, "Failed to login as premium user")
+            return
+        
+        # Store original token and set premium token
+        original_token = self.token
+        self.token = response['token']
+        
+        # Verify premium status
+        success, user_data = self.run_test("Verify Premium for Media Tracking", "GET", "auth/me", 200)
+        if not success or not user_data.get('is_premium'):
+            self.log_result("Premium Status for Media Tracking", False, "User is not premium")
+            self.token = original_token
+            return
+        
+        print(f"   Testing with premium user: {user_data.get('email')}")
+        
+        # Test 1: Mark video as watched
+        success, track_response = self.run_test(
+            "Track Video as Watched",
+            "POST",
+            "media/track/video_1",
+            200
+        )
+        if success:
+            message = track_response.get('message', '')
+            media_id = track_response.get('media_id', '')
+            if 'tracked' in message.lower() and media_id == 'video_1':
+                self.log_result("Video Tracking", True)
+                print(f"   ✓ Video tracked: {message}")
+            else:
+                self.log_result("Video Tracking", False, f"Unexpected response: {track_response}")
+        
+        # Test 2: Mark audio as listened
+        success, track_response = self.run_test(
+            "Track Audio as Listened",
+            "POST",
+            "media/track/audio_1",
+            200
+        )
+        if success:
+            message = track_response.get('message', '')
+            media_id = track_response.get('media_id', '')
+            if 'tracked' in message.lower() and media_id == 'audio_1':
+                self.log_result("Audio Tracking", True)
+                print(f"   ✓ Audio tracked: {message}")
+            else:
+                self.log_result("Audio Tracking", False, f"Unexpected response: {track_response}")
+        
+        # Test 3: Get all media with watched/listened status
+        success, all_media = self.run_test("Get All Media with Status", "GET", "media/all", 200)
+        if success:
+            videos = all_media.get('videos', [])
+            audio = all_media.get('audio', [])
+            stats = all_media.get('stats', {})
+            
+            # Check if videos have watched status
+            video_1 = next((v for v in videos if v.get('id') == 'video_1'), None)
+            if video_1 and video_1.get('watched'):
+                self.log_result("Video Watched Status", True)
+                print(f"   ✓ Video 1 marked as watched")
+            else:
+                self.log_result("Video Watched Status", False, "Video 1 not marked as watched")
+            
+            # Check if audio have listened status
+            audio_1 = next((a for a in audio if a.get('id') == 'audio_1'), None)
+            if audio_1 and audio_1.get('listened'):
+                self.log_result("Audio Listened Status", True)
+                print(f"   ✓ Audio 1 marked as listened")
+            else:
+                self.log_result("Audio Listened Status", False, "Audio 1 not marked as listened")
+            
+            # Check stats
+            watched_count = stats.get('watched_count', 0)
+            listened_count = stats.get('listened_count', 0)
+            
+            if watched_count >= 1:
+                self.log_result("Watched Count Stats", True)
+                print(f"   ✓ Watched count: {watched_count}")
+            else:
+                self.log_result("Watched Count Stats", False, f"Expected watched_count >= 1, got {watched_count}")
+            
+            if listened_count >= 1:
+                self.log_result("Listened Count Stats", True)
+                print(f"   ✓ Listened count: {listened_count}")
+            else:
+                self.log_result("Listened Count Stats", False, f"Expected listened_count >= 1, got {listened_count}")
+        
+        # Test 4: Get media history
+        success, history_data = self.run_test("Get Media History", "GET", "media/history", 200)
+        if success:
+            history = history_data.get('history', [])
+            if len(history) >= 2:  # Should have video_1 and audio_1
+                self.log_result("Media History", True)
+                print(f"   ✓ Found {len(history)} items in history")
+                
+                # Check if our tracked items are in history
+                tracked_ids = [item.get('media_id') for item in history]
+                if 'video_1' in tracked_ids and 'audio_1' in tracked_ids:
+                    self.log_result("History Contains Tracked Items", True)
+                else:
+                    self.log_result("History Contains Tracked Items", False, f"Missing tracked items in history: {tracked_ids}")
+            else:
+                self.log_result("Media History", False, f"Expected at least 2 history items, got {len(history)}")
+        
+        # Test 5: Unmark video as watched
+        success, untrack_response = self.run_test(
+            "Untrack Video",
+            "DELETE",
+            "media/track/video_1",
+            200
+        )
+        if success:
+            message = untrack_response.get('message', '')
+            media_id = untrack_response.get('media_id', '')
+            if 'untracked' in message.lower() and media_id == 'video_1':
+                self.log_result("Video Untracking", True)
+                print(f"   ✓ Video untracked: {message}")
+            else:
+                self.log_result("Video Untracking", False, f"Unexpected response: {untrack_response}")
+        
+        # Test 6: Verify video is no longer marked as watched
+        success, updated_media = self.run_test("Verify Video Untracked", "GET", "media/all", 200)
+        if success:
+            videos = updated_media.get('videos', [])
+            video_1 = next((v for v in videos if v.get('id') == 'video_1'), None)
+            if video_1 and not video_1.get('watched', True):  # Should be False or missing
+                self.log_result("Video Untrack Verification", True)
+                print(f"   ✓ Video 1 no longer marked as watched")
+            else:
+                self.log_result("Video Untrack Verification", False, "Video 1 still marked as watched")
+        
+        # Restore original token
+        self.token = original_token
+
+    def test_notification_preferences_api(self):
+        """Test Notification Preferences API"""
+        print("\n🔔 Testing Notification Preferences API...")
+        
+        if not self.token:
+            self.log_result("Notification Preferences Test Setup", False, "No authentication token")
+            return
+        
+        # Test 1: Get default notification preferences
+        success, prefs_data = self.run_test("Get Default Notification Preferences", "GET", "notifications/preferences", 200)
+        if success:
+            daily_devotional = prefs_data.get('daily_devotional')
+            reading_plan_reminder = prefs_data.get('reading_plan_reminder')
+            weekly_sermon_updates = prefs_data.get('weekly_sermon_updates')
+            reminder_time = prefs_data.get('reminder_time')
+            
+            print(f"   Default preferences:")
+            print(f"     Daily Devotional: {daily_devotional}")
+            print(f"     Reading Plan Reminder: {reading_plan_reminder}")
+            print(f"     Weekly Sermon Updates: {weekly_sermon_updates}")
+            print(f"     Reminder Time: {reminder_time}")
+            
+            # Check if all required fields are present
+            required_fields = ['daily_devotional', 'reading_plan_reminder', 'weekly_sermon_updates', 'reminder_time']
+            missing_fields = [field for field in required_fields if field not in prefs_data]
+            if missing_fields:
+                self.log_result("Notification Preferences Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("Notification Preferences Structure", True)
+            
+            # Check default values (should be reasonable defaults)
+            if isinstance(daily_devotional, bool) and isinstance(reading_plan_reminder, bool) and isinstance(weekly_sermon_updates, bool):
+                self.log_result("Notification Preferences Types", True)
+            else:
+                self.log_result("Notification Preferences Types", False, "Boolean fields are not boolean type")
+            
+            if reminder_time and ':' in str(reminder_time):
+                self.log_result("Reminder Time Format", True)
+            else:
+                self.log_result("Reminder Time Format", False, f"Invalid time format: {reminder_time}")
+        
+        # Test 2: Update notification preferences
+        new_preferences = {
+            "daily_devotional": False,
+            "reading_plan_reminder": True,
+            "weekly_sermon_updates": False,
+            "reminder_time": "07:00"
+        }
+        
+        success, update_response = self.run_test(
+            "Update Notification Preferences",
+            "PUT",
+            "notifications/preferences",
+            200,
+            data=new_preferences
+        )
+        if success:
+            message = update_response.get('message', '')
+            if 'updated' in message.lower() or 'success' in message.lower():
+                self.log_result("Notification Preferences Update", True)
+                print(f"   ✓ Preferences updated: {message}")
+            else:
+                self.log_result("Notification Preferences Update", False, f"Unexpected response: {update_response}")
+        
+        # Test 3: Verify changes were saved
+        success, updated_prefs = self.run_test("Verify Updated Preferences", "GET", "notifications/preferences", 200)
+        if success:
+            daily_devotional = updated_prefs.get('daily_devotional')
+            reading_plan_reminder = updated_prefs.get('reading_plan_reminder')
+            weekly_sermon_updates = updated_prefs.get('weekly_sermon_updates')
+            reminder_time = updated_prefs.get('reminder_time')
+            
+            print(f"   Updated preferences:")
+            print(f"     Daily Devotional: {daily_devotional}")
+            print(f"     Reading Plan Reminder: {reading_plan_reminder}")
+            print(f"     Weekly Sermon Updates: {weekly_sermon_updates}")
+            print(f"     Reminder Time: {reminder_time}")
+            
+            # Verify each field matches what we set
+            verification_passed = True
+            if daily_devotional != new_preferences['daily_devotional']:
+                self.log_result("Daily Devotional Update", False, f"Expected {new_preferences['daily_devotional']}, got {daily_devotional}")
+                verification_passed = False
+            
+            if reading_plan_reminder != new_preferences['reading_plan_reminder']:
+                self.log_result("Reading Plan Reminder Update", False, f"Expected {new_preferences['reading_plan_reminder']}, got {reading_plan_reminder}")
+                verification_passed = False
+            
+            if weekly_sermon_updates != new_preferences['weekly_sermon_updates']:
+                self.log_result("Weekly Sermon Updates Update", False, f"Expected {new_preferences['weekly_sermon_updates']}, got {weekly_sermon_updates}")
+                verification_passed = False
+            
+            if reminder_time != new_preferences['reminder_time']:
+                self.log_result("Reminder Time Update", False, f"Expected {new_preferences['reminder_time']}, got {reminder_time}")
+                verification_passed = False
+            
+            if verification_passed:
+                self.log_result("Notification Preferences Verification", True)
+                print("   ✓ All preferences updated correctly")
+
+    def test_news_scripture_analysis_api(self):
+        """Test News-Scripture Analysis API (Premium feature)"""
+        print("\n📰 Testing News-Scripture Analysis API (Premium Feature)...")
+        
+        # Try to use existing premium user credentials
+        premium_email = "premium@test.com"
+        premium_password = "test123"
+        
+        # Login as premium user
+        success, response = self.run_test(
+            "Premium User Login for News Analysis",
+            "POST",
+            "auth/login",
+            200,
+            data={
+                "email": premium_email,
+                "password": premium_password
+            }
+        )
+        
+        if not success or not response.get('token'):
+            self.log_result("News Analysis Test Setup", False, "Failed to login as premium user")
+            return
+        
+        # Store original token and set premium token
+        original_token = self.token
+        self.token = response['token']
+        
+        # Verify premium status
+        success, user_data = self.run_test("Verify Premium for News Analysis", "GET", "auth/me", 200)
+        if not success or not user_data.get('is_premium'):
+            self.log_result("Premium Status for News Analysis", False, "User is not premium")
+            self.token = original_token
+            return
+        
+        print(f"   Testing with premium user: {user_data.get('email')}")
+        
+        # Test 1: Analyze news with scripture
+        news_data = {
+            "news_headline": "Global Climate Summit Reaches New Agreement",
+            "news_content": "World leaders gathered to discuss environmental policies and signed a historic agreement to reduce carbon emissions."
+        }
+        
+        success, analysis_response = self.run_test(
+            "Analyze News with Scripture",
+            "POST",
+            "analyze/news",
+            200,
+            data=news_data
+        )
+        
+        analysis_id = None
+        if success:
+            analysis_id = analysis_response.get('analysis_id')
+            news_headline = analysis_response.get('news_headline')
+            scripture_references = analysis_response.get('scripture_references', [])
+            analysis = analysis_response.get('analysis', '')
+            spiritual_application = analysis_response.get('spiritual_application', '')
+            created_at = analysis_response.get('created_at')
+            
+            print(f"   Analysis ID: {analysis_id}")
+            print(f"   Headline: {news_headline}")
+            
+            # Check required fields
+            required_fields = ['analysis_id', 'news_headline', 'scripture_references', 'analysis']
+            missing_fields = [field for field in required_fields if field not in analysis_response]
+            if missing_fields:
+                self.log_result("News Analysis Response Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("News Analysis Response Structure", True)
+            
+            # Check scripture references
+            if scripture_references and len(scripture_references) > 0:
+                self.log_result("Scripture References Provided", True)
+                print(f"   ✓ Found {len(scripture_references)} scripture references")
+                
+                # Check structure of first scripture reference
+                if scripture_references:
+                    ref = scripture_references[0]
+                    ref_fields = ['reference', 'text', 'connection']
+                    missing_ref_fields = [field for field in ref_fields if field not in ref]
+                    if missing_ref_fields:
+                        self.log_result("Scripture Reference Structure", False, f"Missing fields in reference: {missing_ref_fields}")
+                    else:
+                        self.log_result("Scripture Reference Structure", True)
+                        print(f"   Sample reference: {ref.get('reference')} - {ref.get('text', '')[:50]}...")
+            else:
+                self.log_result("Scripture References Provided", False, "No scripture references in response")
+            
+            # Check analysis content
+            if analysis and len(analysis) > 50:  # Should have substantial analysis
+                self.log_result("Analysis Content Quality", True)
+                print(f"   ✓ Analysis provided ({len(analysis)} characters)")
+            else:
+                self.log_result("Analysis Content Quality", False, f"Analysis too short or missing: {len(analysis) if analysis else 0} characters")
+            
+            # Check spiritual application
+            if spiritual_application:
+                self.log_result("Spiritual Application Provided", True)
+                print(f"   ✓ Spiritual application provided")
+            else:
+                self.log_result("Spiritual Application Provided", False, "No spiritual application provided")
+        
+        # Test 2: Get analysis history
+        success, history_data = self.run_test("Get Analysis History", "GET", "analyze/history", 200)
+        if success:
+            analyses = history_data.get('analyses', [])
+            if len(analyses) >= 1:  # Should have at least our recent analysis
+                self.log_result("Analysis History", True)
+                print(f"   ✓ Found {len(analyses)} analyses in history")
+                
+                # Check if our analysis is in the history
+                if analysis_id:
+                    found_analysis = next((a for a in analyses if a.get('analysis_id') == analysis_id), None)
+                    if found_analysis:
+                        self.log_result("Recent Analysis in History", True)
+                        print(f"   ✓ Recent analysis found in history")
+                    else:
+                        self.log_result("Recent Analysis in History", False, "Recent analysis not found in history")
+            else:
+                self.log_result("Analysis History", False, f"Expected at least 1 analysis in history, got {len(analyses)}")
+        
+        # Restore original token
+        self.token = original_token
+
+    def test_audio_urls_verification(self):
+        """Test Audio URLs are valid Internet Archive URLs (Premium feature)"""
+        print("\n🎵 Testing Audio URLs Verification (Premium Feature)...")
+        
+        # Try to use existing premium user credentials
+        premium_email = "premium@test.com"
+        premium_password = "test123"
+        
+        # Login as premium user
+        success, response = self.run_test(
+            "Premium User Login for Audio URLs",
+            "POST",
+            "auth/login",
+            200,
+            data={
+                "email": premium_email,
+                "password": premium_password
+            }
+        )
+        
+        if not success or not response.get('token'):
+            self.log_result("Audio URLs Test Setup", False, "Failed to login as premium user")
+            return
+        
+        # Store original token and set premium token
+        original_token = self.token
+        self.token = response['token']
+        
+        # Verify premium status
+        success, user_data = self.run_test("Verify Premium for Audio URLs", "GET", "auth/me", 200)
+        if not success or not user_data.get('is_premium'):
+            self.log_result("Premium Status for Audio URLs", False, "User is not premium")
+            self.token = original_token
+            return
+        
+        print(f"   Testing with premium user: {user_data.get('email')}")
+        
+        # Test: Get audio sermons and verify URLs
+        success, audio_data = self.run_test("Get Audio Sermons for URL Verification", "GET", "media/audio", 200)
+        if success:
+            audio_sermons = audio_data.get('audio', [])
+            if audio_sermons:
+                print(f"   Found {len(audio_sermons)} audio sermons")
+                
+                valid_urls = 0
+                invalid_urls = []
+                
+                for sermon in audio_sermons:
+                    audio_url = sermon.get('audio_url', '')
+                    sermon_title = sermon.get('title', 'Unknown')
+                    
+                    # Check if URL is from Internet Archive
+                    if 'archive.org' in audio_url and audio_url.startswith('https://'):
+                        valid_urls += 1
+                        print(f"   ✓ Valid Internet Archive URL: {sermon_title}")
+                    else:
+                        invalid_urls.append(f"{sermon_title}: {audio_url}")
+                
+                if valid_urls == len(audio_sermons):
+                    self.log_result("All Audio URLs are Internet Archive", True)
+                    print(f"   ✓ All {valid_urls} audio URLs are valid Internet Archive URLs")
+                else:
+                    self.log_result("All Audio URLs are Internet Archive", False, f"Invalid URLs found: {invalid_urls}")
+                
+                # Check URL format more specifically
+                ia_pattern_found = 0
+                for sermon in audio_sermons:
+                    audio_url = sermon.get('audio_url', '')
+                    # Internet Archive URLs typically follow pattern: https://ia[numbers].us.archive.org/...
+                    if 'ia' in audio_url and 'us.archive.org' in audio_url:
+                        ia_pattern_found += 1
+                
+                if ia_pattern_found == len(audio_sermons):
+                    self.log_result("Internet Archive URL Pattern", True)
+                    print(f"   ✓ All URLs follow Internet Archive pattern")
+                else:
+                    self.log_result("Internet Archive URL Pattern", False, f"Only {ia_pattern_found}/{len(audio_sermons)} URLs follow IA pattern")
+            else:
+                self.log_result("Audio Sermons Available", False, "No audio sermons found")
+        
+        # Restore original token
+        self.token = original_token
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Prophecy News Study Bible API Tests")
