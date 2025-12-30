@@ -101,12 +101,19 @@ const ProfilePage = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Save profile settings
       await axios.put(`${API_URL}/profile`, {
         name,
         ...settings
       }, {
         headers: getAuthHeaders()
       });
+      
+      // Save notification preferences
+      await axios.put(`${API_URL}/notifications/preferences`, notificationPrefs, {
+        headers: getAuthHeaders()
+      });
+      
       updateUser({ name });
       toast.success('Profile updated successfully!');
     } catch (error) {
