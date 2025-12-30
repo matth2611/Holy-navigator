@@ -42,6 +42,8 @@ class HolyNavigatorAPITester:
                 response = self.session.get(url, headers=test_headers)
             elif method == 'POST':
                 response = self.session.post(url, json=data, headers=test_headers)
+            elif method == 'PUT':
+                response = self.session.put(url, json=data, headers=test_headers)
             elif method == 'DELETE':
                 response = self.session.delete(url, headers=test_headers)
 
