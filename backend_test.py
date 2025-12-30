@@ -84,7 +84,70 @@ class HolyNavigatorAPITester:
         
         # Test chapter endpoint with sample data
         self.run_test("Get Genesis Chapter 1", "GET", "bible/chapter/Genesis/1", 200)
-        self.run_test("Get John Chapter 3", "GET", "bible/chapter/John/3", 200)
+        
+        # Test John 3:16 specifically (mentioned in requirements)
+        success, john_data = self.run_test("Get John Chapter 3", "GET", "bible/chapter/John/3", 200)
+        if success:
+            translation = john_data.get('translation', '')
+            verses = john_data.get('verses', [])
+            
+            # Check if translation is World English Bible
+            if 'World English Bible' in translation or 'WEB' in translation:
+                self.log_result("John 3 Translation Check", True)
+                print(f"   Translation: {translation}")
+            else:
+                self.log_result("John 3 Translation Check", False, f"Expected World English Bible, got: {translation}")
+            
+            # Check if verse 16 exists and has real content
+            verse_16 = next((v for v in verses if v.get('verse') == 16), None)
+            if verse_16 and len(verse_16.get('text', '')) > 50:  # Real verse should be substantial
+                self.log_result("John 3:16 Real Content", True)
+                print(f"   John 3:16: {verse_16['text'][:80]}...")
+            else:
+                self.log_result("John 3:16 Real Content", False, "Verse 16 missing or placeholder content")
+        
+        # Test single verse endpoint
+        success, verse_data = self.run_test("Get John 3:16", "GET", "bible/verse/John/3/16", 200)
+        if success:
+            verse_text = verse_data.get('text', '')
+            translation = verse_data.get('translation', '')
+            
+            # Check for real verse content (should contain "God so loved")
+            if 'God so loved' in verse_text or 'loved the world' in verse_text:
+                self.log_result("John 3:16 API Content", True)
+                print(f"   Single verse API working: {verse_text[:50]}...")
+            else:
+                self.log_result("John 3:16 API Content", False, f"Unexpected verse content: {verse_text}")
+            
+            # Check translation
+            if 'World English Bible' in translation:
+                self.log_result("Single Verse Translation", True)
+            else:
+                self.log_result("Single Verse Translation", False, f"Expected WEB, got: {translation}")
+        
+        # Test Bible search functionality
+        success, search_data = self.run_test("Bible Search - 'love'", "GET", "bible/search/verses?q=love", 200)
+        if success:
+            results = search_data.get('results', [])
+            query = search_data.get('query', '')
+            
+            if len(results) > 0:
+                self.log_result("Bible Search Functionality", True)
+                print(f"   Search for '{query}' returned {len(results)} results")
+                
+                # Check result structure
+                if results:
+                    result = results[0]
+                    required_fields = ['reference', 'text', 'book', 'chapter', 'verse']
+                    missing_fields = [field for field in required_fields if field not in result]
+                    if missing_fields:
+                        self.log_result("Search Result Structure", False, f"Missing fields: {missing_fields}")
+                    else:
+                        self.log_result("Search Result Structure", True)
+                        print(f"   Sample result: {result.get('reference')} - {result.get('text', '')[:50]}...")
+            else:
+                self.log_result("Bible Search Functionality", False, "No search results returned")
+        
         self.run_test("Get Psalms Chapter 23", "GET", "bible/chapter/Psalms/23", 200)
         
         # Test invalid chapter
