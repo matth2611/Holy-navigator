@@ -22,6 +22,7 @@ import BookmarksPage from './pages/BookmarksPage';
 import PricingPage from './pages/PricingPage';
 import MediaLibraryPage from './pages/MediaLibraryPage';
 import ProfilePage from './pages/ProfilePage';
+import ReadingPlanPage from './pages/ReadingPlanPage';
 
 import './App.css';
 
@@ -52,6 +53,7 @@ const AppContent = () => {
           <Route path="/bible/:book/:chapter" element={<BiblePage />} />
           <Route path="/devotional" element={<DevotionalPage />} />
           <Route path="/dictionary" element={<DictionaryPage />} />
+          <Route path="/reading-plan" element={<ReadingPlanPage />} />
           
           {/* Protected Routes */}
           <Route path="/bookmarks" element={
