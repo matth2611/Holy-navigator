@@ -1,53 +1,99 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from './components/ui/sonner';
+import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { ProtectedRoute, PremiumRoute } from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Pages
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import AuthCallback from './pages/AuthCallback';
+import BiblePage from './pages/BiblePage';
+import DevotionalPage from './pages/DevotionalPage';
+import DictionaryPage from './pages/DictionaryPage';
+import NewsAnalysisPage from './pages/NewsAnalysisPage';
+import ForumPage from './pages/ForumPage';
+import JournalPage from './pages/JournalPage';
+import BookmarksPage from './pages/BookmarksPage';
+import PricingPage from './pages/PricingPage';
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+import './App.css';
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+const AppContent = () => {
+  const location = useLocation();
+  
+  // Check URL fragment for session_id (OAuth callback)
+  if (location.hash?.includes('session_id=')) {
+    return <AuthCallback />;
+  }
+  
+  const hideNavFooter = ['/login', '/register', '/auth/callback'].includes(location.pathname);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <div className="min-h-screen flex flex-col">
+      {!hideNavFooter && <Navbar />}
+      <main className="flex-1">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          
+          {/* Free Features */}
+          <Route path="/bible" element={<BiblePage />} />
+          <Route path="/bible/:book/:chapter" element={<BiblePage />} />
+          <Route path="/devotional" element={<DevotionalPage />} />
+          <Route path="/dictionary" element={<DictionaryPage />} />
+          
+          {/* Protected Routes */}
+          <Route path="/bookmarks" element={
+            <ProtectedRoute>
+              <BookmarksPage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Premium Routes */}
+          <Route path="/news-analysis" element={
+            <PremiumRoute>
+              <NewsAnalysisPage />
+            </PremiumRoute>
+          } />
+          <Route path="/forum" element={
+            <PremiumRoute>
+              <ForumPage />
+            </PremiumRoute>
+          } />
+          <Route path="/journal" element={
+            <PremiumRoute>
+              <JournalPage />
+            </PremiumRoute>
+          } />
+          
+          {/* Subscription Success */}
+          <Route path="/subscription/success" element={<PricingPage />} />
+        </Routes>
+      </main>
+      {!hideNavFooter && <Footer />}
     </div>
   );
 };
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppContent />
+          <Toaster position="top-right" />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
