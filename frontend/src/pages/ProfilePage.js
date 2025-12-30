@@ -310,32 +310,81 @@ const ProfilePage = () => {
             <div className="bg-card border border-border/40 rounded-2xl p-6">
               <h3 className="font-serif text-xl font-semibold mb-6 flex items-center gap-2">
                 <Bell className="w-5 h-5 text-[#C5A059]" />
-                Notifications
+                Notifications & Reminders
               </h3>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Email Notifications</p>
-                    <p className="text-sm text-muted-foreground">Receive daily devotional reminders</p>
+                    <p className="font-medium">Daily Devotional Reminder</p>
+                    <p className="text-sm text-muted-foreground">Get reminded to read your daily devotional</p>
                   </div>
                   <Switch
-                    checked={settings.notification_email}
-                    onCheckedChange={(checked) => setSettings({ ...settings, notification_email: checked })}
-                    data-testid="email-notifications-switch"
+                    checked={notificationPrefs.daily_devotional}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, daily_devotional: checked })}
+                    data-testid="devotional-reminder-switch"
                   />
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Forum Notifications</p>
-                    <p className="text-sm text-muted-foreground">Get notified about replies to your posts</p>
+                    <p className="font-medium">Reading Plan Reminder</p>
+                    <p className="text-sm text-muted-foreground">Daily reminder for Bible in a Year readings</p>
                   </div>
                   <Switch
-                    checked={settings.notification_forum}
-                    onCheckedChange={(checked) => setSettings({ ...settings, notification_forum: checked })}
-                    data-testid="forum-notifications-switch"
+                    checked={notificationPrefs.reading_plan_reminder}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, reading_plan_reminder: checked })}
+                    data-testid="reading-plan-reminder-switch"
                   />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Weekly Sermon Updates</p>
+                    <p className="text-sm text-muted-foreground">Get notified when new sermons are added</p>
+                  </div>
+                  <Switch
+                    checked={notificationPrefs.weekly_sermon_updates}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, weekly_sermon_updates: checked })}
+                    data-testid="sermon-updates-switch"
+                  />
+                </div>
+                
+                <div className="border-t border-border/40 pt-4 mt-4">
+                  <Label>Reminder Time</Label>
+                  <Select
+                    value={notificationPrefs.reminder_time}
+                    onValueChange={(value) => setNotificationPrefs({ ...notificationPrefs, reminder_time: value })}
+                  >
+                    <SelectTrigger className="mt-2" data-testid="reminder-time-select">
+                      <SelectValue placeholder="Select time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="06:00">6:00 AM</SelectItem>
+                      <SelectItem value="07:00">7:00 AM</SelectItem>
+                      <SelectItem value="08:00">8:00 AM</SelectItem>
+                      <SelectItem value="09:00">9:00 AM</SelectItem>
+                      <SelectItem value="12:00">12:00 PM</SelectItem>
+                      <SelectItem value="18:00">6:00 PM</SelectItem>
+                      <SelectItem value="20:00">8:00 PM</SelectItem>
+                      <SelectItem value="21:00">9:00 PM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="border-t border-border/40 pt-4 mt-4">
+                  <p className="text-sm font-medium mb-3">Email Notifications</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Forum Replies</p>
+                      <p className="text-sm text-muted-foreground">Get notified about replies to your posts</p>
+                    </div>
+                    <Switch
+                      checked={settings.notification_forum}
+                      onCheckedChange={(checked) => setSettings({ ...settings, notification_forum: checked })}
+                      data-testid="forum-notifications-switch"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
