@@ -230,7 +230,14 @@ async def register(user_data: UserCreate, response: Response):
 @api_router.post("/auth/login")
 async def login(user_data: UserLogin, response: Response):
     user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
-    if not user or not verify_password(user_data.password, user["password"]):
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Check if user was created via Google OAuth (no password)
+    if not user.get("password"):
+        raise HTTPException(status_code=401, detail="Please sign in with Google")
+    
+    if not verify_password(user_data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token = create_token(user["user_id"])
