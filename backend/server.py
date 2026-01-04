@@ -1240,21 +1240,25 @@ Please provide relevant scripture references, analysis, and any prophetic signif
         
         import json
         try:
+            # Handle response - it might be a string or have a .text attribute
+            response_text = response.text if hasattr(response, 'text') else str(response)
+            
             # Try to parse JSON from response
-            json_match = re.search(r'\{[\s\S]*\}', response.text)
+            json_match = re.search(r'\{[\s\S]*\}', response_text)
             if json_match:
                 analysis_data = json.loads(json_match.group())
             else:
                 analysis_data = {
                     "scripture_references": [],
-                    "analysis": response.text,
+                    "analysis": response_text,
                     "spiritual_application": "",
                     "prophetic_significance": ""
                 }
         except json.JSONDecodeError:
+            response_text = response.text if hasattr(response, 'text') else str(response)
             analysis_data = {
                 "scripture_references": [],
-                "analysis": response.text,
+                "analysis": response_text,
                 "spiritual_application": "",
                 "prophetic_significance": ""
             }
