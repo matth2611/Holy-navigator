@@ -1272,7 +1272,8 @@ Please provide relevant scripture references, analysis, and any prophetic signif
         }
         
         await db.news_analyses.insert_one(analysis_record)
-        del analysis_record["_id"] if "_id" in analysis_record else None
+        if "_id" in analysis_record:
+            del analysis_record["_id"]
         
         return analysis_record
         
