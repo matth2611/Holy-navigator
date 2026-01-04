@@ -88,6 +88,9 @@ const AppContent = () => {
           
           {/* Subscription Success */}
           <Route path="/subscription/success" element={<PricingPage />} />
+          
+          {/* Legal Pages */}
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
         </Routes>
       </main>
       {!hideNavFooter && <Footer />}
