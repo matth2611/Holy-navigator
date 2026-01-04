@@ -1052,6 +1052,234 @@ async def upvote_comment(comment_id: str, request: Request):
         )
         return {"message": "Upvoted", "upvoted": True}
 
+# ==================== DAILY NEWS FROM GOOGLE NEWS ====================
+
+import feedparser
+import html
+import re
+
+# Google News RSS Feed URLs for different categories
+GOOGLE_NEWS_FEEDS = {
+    "world": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en",
+    "middle_east": "https://news.google.com/rss/search?q=israel+OR+middle+east&hl=en-US&gl=US&ceid=US:en",
+    "disasters": "https://news.google.com/rss/search?q=earthquake+OR+hurricane+OR+flood+OR+disaster+OR+climate&hl=en-US&gl=US&ceid=US:en",
+    "politics": "https://news.google.com/rss/topics/CAAqIQgKIhtDQkFTRGdvSUwyMHZNR1Z4ZERBU0FtVnVLQUFQAQ?hl=en-US&gl=US&ceid=US:en"
+}
+
+def clean_html(text):
+    """Remove HTML tags and decode entities"""
+    clean = re.sub(r'<[^>]+>', '', text)
+    return html.unescape(clean).strip()
+
+def extract_source_from_title(title):
+    """Extract source name from Google News title format 'Title - Source'"""
+    if ' - ' in title:
+        parts = title.rsplit(' - ', 1)
+        return parts[0].strip(), parts[1].strip()
+    return title, "Unknown"
+
+async def fetch_google_news():
+    """Fetch news from Google News RSS feeds"""
+    all_news = []
+    seen_titles = set()
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        for category, feed_url in GOOGLE_NEWS_FEEDS.items():
+            try:
+                response = await client.get(feed_url)
+                if response.status_code == 200:
+                    feed = feedparser.parse(response.text)
+                    
+                    for entry in feed.entries[:3]:  # Get top 3 from each category
+                        title, source = extract_source_from_title(entry.get('title', ''))
+                        
+                        # Skip duplicates
+                        if title in seen_titles:
+                            continue
+                        seen_titles.add(title)
+                        
+                        description = clean_html(entry.get('description', entry.get('summary', '')))
+                        
+                        news_item = {
+                            "news_id": f"news_{uuid.uuid4().hex[:12]}",
+                            "title": title,
+                            "source": source,
+                            "description": description[:500] if description else "",
+                            "link": entry.get('link', ''),
+                            "category": category,
+                            "published": entry.get('published', ''),
+                            "fetched_at": datetime.now(timezone.utc).isoformat()
+                        }
+                        all_news.append(news_item)
+                        
+            except Exception as e:
+                logger.error(f"Error fetching {category} news: {e}")
+                continue
+    
+    return all_news
+
+@api_router.get("/news/daily")
+async def get_daily_news(request: Request):
+    """Get today's news stories (no auth required to view, auth required to analyze)"""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Check if we have today's news cached
+    cached = await db.daily_news.find_one({"date": today}, {"_id": 0})
+    
+    if cached and len(cached.get("stories", [])) >= 5:
+        return {"date": today, "stories": cached["stories"], "cached": True}
+    
+    # Fetch fresh news
+    news_stories = await fetch_google_news()
+    
+    if news_stories:
+        # Store in database
+        await db.daily_news.update_one(
+            {"date": today},
+            {"$set": {"date": today, "stories": news_stories, "updated_at": datetime.now(timezone.utc).isoformat()}},
+            upsert=True
+        )
+        return {"date": today, "stories": news_stories, "cached": False}
+    
+    # If fetch failed, return any cached data
+    if cached:
+        return {"date": today, "stories": cached["stories"], "cached": True}
+    
+    return {"date": today, "stories": [], "cached": False}
+
+@api_router.post("/news/refresh")
+async def refresh_daily_news(request: Request):
+    """Force refresh today's news (admin/premium feature)"""
+    user = await get_premium_user(request)
+    
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    news_stories = await fetch_google_news()
+    
+    if news_stories:
+        await db.daily_news.update_one(
+            {"date": today},
+            {"$set": {"date": today, "stories": news_stories, "updated_at": datetime.now(timezone.utc).isoformat()}},
+            upsert=True
+        )
+        return {"message": "News refreshed", "count": len(news_stories), "stories": news_stories}
+    
+    raise HTTPException(status_code=500, detail="Failed to fetch news")
+
+@api_router.post("/news/analyze/{news_id}")
+async def analyze_daily_news(news_id: str, request: Request):
+    """Analyze a specific news story with scripture (Premium)"""
+    user = await get_premium_user(request)
+    
+    # Find the news story
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    daily_news = await db.daily_news.find_one({"date": today}, {"_id": 0})
+    
+    if not daily_news:
+        raise HTTPException(status_code=404, detail="No daily news found")
+    
+    news_story = None
+    for story in daily_news.get("stories", []):
+        if story["news_id"] == news_id:
+            news_story = story
+            break
+    
+    if not news_story:
+        raise HTTPException(status_code=404, detail="News story not found")
+    
+    # Check if already analyzed
+    existing = await db.news_analyses.find_one({
+        "news_id": news_id,
+        "user_id": user["user_id"]
+    }, {"_id": 0})
+    
+    if existing:
+        return existing
+    
+    # Perform analysis using LLM
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"news_analysis_{uuid.uuid4().hex[:8]}",
+        system_message="""You are a biblical scholar specializing in connecting current events to biblical prophecy and scripture. 
+
+For each news item:
+1. Identify 2-4 relevant Bible verses that relate to the themes, situations, or prophetic significance
+2. Explain how each scripture connects to the current event
+3. Provide practical spiritual insights for believers
+
+Focus on prophetic implications and how believers should understand world events through a biblical lens.
+
+Format your response as JSON with this structure:
+{
+    "scripture_references": [
+        {
+            "reference": "Book Chapter:Verse",
+            "text": "The verse text",
+            "connection": "How this relates to the news"
+        }
+    ],
+    "analysis": "Overall analysis of how biblical principles and prophecy apply to this news event",
+    "spiritual_application": "Practical takeaways for believers",
+    "prophetic_significance": "Any prophetic implications or connections to end times prophecy"
+}"""
+    ).with_model("openai", "gpt-5.2")
+    
+    prompt = f"""Analyze this current news event and connect it to biblical scripture and prophecy:
+
+Headline: {news_story['title']}
+
+Summary: {news_story['description']}
+
+Source: {news_story['source']}
+
+Please provide relevant scripture references, analysis, and any prophetic significance."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        
+        import json
+        try:
+            # Try to parse JSON from response
+            json_match = re.search(r'\{[\s\S]*\}', response.text)
+            if json_match:
+                analysis_data = json.loads(json_match.group())
+            else:
+                analysis_data = {
+                    "scripture_references": [],
+                    "analysis": response.text,
+                    "spiritual_application": "",
+                    "prophetic_significance": ""
+                }
+        except json.JSONDecodeError:
+            analysis_data = {
+                "scripture_references": [],
+                "analysis": response.text,
+                "spiritual_application": "",
+                "prophetic_significance": ""
+            }
+        
+        # Save analysis
+        analysis_record = {
+            "analysis_id": f"analysis_{uuid.uuid4().hex[:12]}",
+            "news_id": news_id,
+            "user_id": user["user_id"],
+            "news_headline": news_story["title"],
+            "news_source": news_story["source"],
+            "news_description": news_story["description"],
+            **analysis_data,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.news_analyses.insert_one(analysis_record)
+        del analysis_record["_id"] if "_id" in analysis_record else None
+        
+        return analysis_record
+        
+    except Exception as e:
+        logger.error(f"Analysis error: {e}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
 # ==================== NEWS-SCRIPTURE ANALYSIS (PREMIUM) ====================
 
 @api_router.post("/analyze/news")
