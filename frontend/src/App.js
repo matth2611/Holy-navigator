@@ -23,6 +23,7 @@ import PricingPage from './pages/PricingPage';
 import MediaLibraryPage from './pages/MediaLibraryPage';
 import ProfilePage from './pages/ProfilePage';
 import ReadingPlanPage from './pages/ReadingPlanPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 import './App.css';
 
