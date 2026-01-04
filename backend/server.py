@@ -1169,7 +1169,7 @@ async def create_checkout(sub_data: SubscriptionCreate, request: Request):
     
     stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
     
-    success_url = f"{host_url}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
+    success_url = f"{host_url}/pricing?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{host_url}/pricing"
     
     checkout_request = CheckoutSessionRequest(
