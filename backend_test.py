@@ -1557,6 +1557,9 @@ class ProphecyNewsStudyBibleAPITester:
         self.test_news_scripture_analysis_api()
         self.test_audio_urls_verification()
         
+        # Test Daily News API (as requested in review)
+        self.test_daily_news_api()
+        
         # Print summary
         print("\n" + "=" * 60)
         print(f"📊 Test Summary:")
