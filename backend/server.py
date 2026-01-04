@@ -1331,8 +1331,10 @@ Please provide relevant scripture references and analysis."""
         # Parse the response
         import json
         try:
+            # Handle response - it might be a string or have a .text attribute
+            response_text = response.text if hasattr(response, 'text') else str(response)
+            
             # Try to extract JSON from the response
-            response_text = response
             if "```json" in response_text:
                 response_text = response_text.split("```json")[1].split("```")[0]
             elif "```" in response_text:
@@ -1341,11 +1343,12 @@ Please provide relevant scripture references and analysis."""
             parsed = json.loads(response_text)
         except:
             # If parsing fails, create structured response from text
+            response_text = response.text if hasattr(response, 'text') else str(response)
             parsed = {
                 "scripture_references": [
-                    {"reference": "Romans 8:28", "text": "And we know that all things work together for good...", "connection": response[:500]}
+                    {"reference": "Romans 8:28", "text": "And we know that all things work together for good...", "connection": response_text[:500]}
                 ],
-                "analysis": response,
+                "analysis": response_text,
                 "spiritual_application": "Seek God's wisdom in understanding current events."
             }
         
