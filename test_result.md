@@ -237,11 +237,33 @@ test_plan:
 
 agent_communication:
   - agent: "main"
-    message: "Completed app rename from Holy Navigator to Prophecy News Study Bible. Added Reading Plan route to App.js and navigation link to Navbar. All API endpoints verified working. John 3:16 bug appears to be already fixed. Please test: 1) Reading Plan flow (view today, mark complete, view calendar), 2) User authentication and progress tracking, 3) Navigation across all pages with new branding."
-  - agent: "testing"
-    message: "✅ COMPREHENSIVE BACKEND TESTING COMPLETED - ALL SYSTEMS OPERATIONAL: Tested 90 endpoints with 100% success rate. Key findings: 1) API correctly returns 'Prophecy News Study Bible API' branding ✅ 2) Bible API working - John 3:16 returns correct text 'For God so loved the world...' ✅ 3) Reading Plan endpoints fully functional - today's reading (Day 364), pagination (365 total readings), specific day lookup ✅ 4) User progress tracking complete - mark/unmark days, progress percentage, streak calculation ✅ 5) Authentication, bookmarks, premium features, media library all working ✅. All backend APIs are ready to support frontend functionality. No critical issues found."
-  - agent: "main"
-    message: "Implemented upcoming tasks: 1) Updated audio URLs to use real Internet Archive audio files, 2) Added sermon tracking feature - users can mark videos/audio as watched/listened with stats display, 3) Added notification preferences API and UI with daily devotional, reading plan, and weekly sermon reminders, 4) News-Scripture analysis was already implemented with Emergent LLM Key (GPT-5.2). All features tested via curl and working. Please run comprehensive frontend and backend tests."
+    message: "Implemented daily news feature with Google News RSS feeds. News is fetched from 4 categories: World, Middle East, Disasters/Climate, Politics. Stories are cached daily and refreshed on demand. Users can view news without login, but need Premium to analyze stories with scripture. Updated NewsAnalysisPage with tabs for Today's News and Custom Analysis."
+
+backend:
+  - task: "Daily News API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/news/daily fetches from Google News RSS, caches in MongoDB. POST /api/news/analyze/{news_id} analyzes specific story with LLM."
+
+frontend:
+  - task: "Daily News UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/NewsAnalysisPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added Today's News tab showing 5-10 daily stories with category icons, source, and Find Scripture button. Custom Analysis tab for manual input."
   - agent: "testing"
     message: "✅ NEW FEATURES TESTING COMPLETE - ALL 4 REQUESTED FEATURES WORKING PERFECTLY: Tested 132 total endpoints with 100% success rate. NEW FEATURE RESULTS: 1) Media Tracking API (Premium) ✅ - POST/DELETE /api/media/track/{media_id} working, GET /api/media/all shows correct watched/listened status and stats, GET /api/media/history functional. 2) Notification Preferences API ✅ - GET/PUT /api/notifications/preferences working with proper defaults and updates. 3) News-Scripture Analysis (Premium) ✅ - POST /api/analyze/news returns scripture references, analysis, spiritual application using GPT-5.2, GET /api/analyze/history working. 4) Audio URLs ✅ - All 5 audio sermons have valid Internet Archive URLs. Premium user creation and authentication working. All backend APIs ready for production."
 
