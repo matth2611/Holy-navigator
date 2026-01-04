@@ -1,0 +1,8 @@
+{
+  "appId": "com.prophecynews.studybible",
+  "appName": "Prophecy News Study Bible",
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https"
+  }
+}
