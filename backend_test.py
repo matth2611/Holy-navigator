@@ -1309,6 +1309,212 @@ class ProphecyNewsStudyBibleAPITester:
         # Restore original token
         self.token = original_token
 
+    def test_daily_news_api(self):
+        """Test Daily News API (Public and Premium features)"""
+        print("\n📰 Testing Daily News API...")
+        
+        # Test 1: Get daily news (public endpoint - no auth required)
+        success, news_data = self.run_test("Get Daily News (Public)", "GET", "news/daily", 200)
+        if success:
+            date = news_data.get('date')
+            stories = news_data.get('stories', [])
+            cached = news_data.get('cached')
+            
+            print(f"   Date: {date}")
+            print(f"   Stories: {len(stories)}")
+            print(f"   Cached: {cached}")
+            
+            # Check response structure
+            required_fields = ['date', 'stories', 'cached']
+            missing_fields = [field for field in required_fields if field not in news_data]
+            if missing_fields:
+                self.log_result("Daily News Response Structure", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("Daily News Response Structure", True)
+            
+            # Check if we have stories
+            if stories and len(stories) > 0:
+                self.log_result("Daily News Has Stories", True)
+                print(f"   ✓ Found {len(stories)} news stories")
+                
+                # Check story structure
+                story = stories[0]
+                required_story_fields = ['news_id', 'title', 'source', 'description', 'link', 'category']
+                missing_story_fields = [field for field in required_story_fields if field not in story]
+                if missing_story_fields:
+                    self.log_result("News Story Structure", False, f"Missing fields in story: {missing_story_fields}")
+                else:
+                    self.log_result("News Story Structure", True)
+                    print(f"   Sample story: '{story.get('title', '')[:50]}...' from {story.get('source', '')}")
+                
+                # Check categories
+                categories = set(story.get('category') for story in stories)
+                expected_categories = {'world', 'middle_east', 'disasters', 'politics'}
+                found_categories = categories.intersection(expected_categories)
+                if found_categories:
+                    self.log_result("News Categories Present", True)
+                    print(f"   ✓ Found categories: {', '.join(found_categories)}")
+                else:
+                    self.log_result("News Categories Present", False, f"Expected categories {expected_categories}, found {categories}")
+                
+                # Store a news_id for analysis testing
+                self.test_news_id = story.get('news_id')
+            else:
+                self.log_result("Daily News Has Stories", False, "No stories found in daily news")
+                self.test_news_id = None
+        
+        # Test 2: News Analysis (Premium feature)
+        if hasattr(self, 'test_news_id') and self.test_news_id:
+            # Try to use existing premium user credentials
+            premium_email = "premium@test.com"
+            premium_password = "test123"
+            
+            # Login as premium user
+            success, response = self.run_test(
+                "Premium User Login for News Analysis",
+                "POST",
+                "auth/login",
+                200,
+                data={
+                    "email": premium_email,
+                    "password": premium_password
+                }
+            )
+            
+            if success and response.get('token'):
+                # Store original token and set premium token
+                original_token = self.token
+                self.token = response['token']
+                
+                # Verify premium status
+                success, user_data = self.run_test("Verify Premium for News Analysis", "GET", "auth/me", 200)
+                if success and user_data.get('is_premium'):
+                    print(f"   Testing news analysis with premium user: {user_data.get('email')}")
+                    
+                    # Test news analysis
+                    success, analysis_data = self.run_test(
+                        "Analyze News Story (Premium)",
+                        "POST",
+                        f"news/analyze/{self.test_news_id}",
+                        200
+                    )
+                    
+                    if success:
+                        analysis_id = analysis_data.get('analysis_id')
+                        news_headline = analysis_data.get('news_headline')
+                        scripture_references = analysis_data.get('scripture_references', [])
+                        analysis = analysis_data.get('analysis', '')
+                        spiritual_application = analysis_data.get('spiritual_application', '')
+                        prophetic_significance = analysis_data.get('prophetic_significance', '')
+                        
+                        print(f"   Analysis ID: {analysis_id}")
+                        print(f"   Headline: {news_headline}")
+                        
+                        # Check required fields
+                        required_analysis_fields = ['scripture_references', 'analysis', 'spiritual_application', 'prophetic_significance']
+                        missing_analysis_fields = [field for field in required_analysis_fields if field not in analysis_data]
+                        if missing_analysis_fields:
+                            self.log_result("News Analysis Response Structure", False, f"Missing fields: {missing_analysis_fields}")
+                        else:
+                            self.log_result("News Analysis Response Structure", True)
+                        
+                        # Check scripture references
+                        if scripture_references and len(scripture_references) > 0:
+                            self.log_result("Scripture References in News Analysis", True)
+                            print(f"   ✓ Found {len(scripture_references)} scripture references")
+                            
+                            # Check structure of first scripture reference
+                            if scripture_references:
+                                ref = scripture_references[0]
+                                ref_fields = ['reference', 'text', 'connection']
+                                missing_ref_fields = [field for field in ref_fields if field not in ref]
+                                if missing_ref_fields:
+                                    self.log_result("Scripture Reference Structure in News", False, f"Missing fields: {missing_ref_fields}")
+                                else:
+                                    self.log_result("Scripture Reference Structure in News", True)
+                                    print(f"   Sample reference: {ref.get('reference')} - {ref.get('text', '')[:50]}...")
+                        else:
+                            self.log_result("Scripture References in News Analysis", False, "No scripture references found")
+                        
+                        # Check analysis content
+                        if analysis and len(analysis) > 50:
+                            self.log_result("News Analysis Content Quality", True)
+                            print(f"   ✓ Analysis provided ({len(analysis)} characters)")
+                        else:
+                            self.log_result("News Analysis Content Quality", False, f"Analysis too short: {len(analysis) if analysis else 0} characters")
+                        
+                        # Check spiritual application
+                        if spiritual_application:
+                            self.log_result("Spiritual Application in News", True)
+                        else:
+                            self.log_result("Spiritual Application in News", False, "No spiritual application provided")
+                        
+                        # Check prophetic significance
+                        if prophetic_significance:
+                            self.log_result("Prophetic Significance in News", True)
+                        else:
+                            self.log_result("Prophetic Significance in News", False, "No prophetic significance provided")
+                    
+                    # Test news refresh (Premium feature)
+                    success, refresh_data = self.run_test(
+                        "Refresh Daily News (Premium)",
+                        "POST",
+                        "news/refresh",
+                        200
+                    )
+                    
+                    if success:
+                        message = refresh_data.get('message', '')
+                        count = refresh_data.get('count', 0)
+                        refreshed_stories = refresh_data.get('stories', [])
+                        
+                        if 'refresh' in message.lower() and count > 0:
+                            self.log_result("News Refresh Functionality", True)
+                            print(f"   ✓ News refreshed: {message}, {count} stories")
+                        else:
+                            self.log_result("News Refresh Functionality", False, f"Unexpected refresh response: {refresh_data}")
+                        
+                        # Check if refreshed stories have proper structure
+                        if refreshed_stories:
+                            story = refreshed_stories[0]
+                            required_story_fields = ['news_id', 'title', 'source', 'description', 'link', 'category']
+                            missing_story_fields = [field for field in required_story_fields if field not in story]
+                            if missing_story_fields:
+                                self.log_result("Refreshed Story Structure", False, f"Missing fields: {missing_story_fields}")
+                            else:
+                                self.log_result("Refreshed Story Structure", True)
+                
+                # Restore original token
+                self.token = original_token
+            else:
+                self.log_result("Premium User Setup for News", False, "Failed to login as premium user")
+        else:
+            self.log_result("News Analysis Test Setup", False, "No news_id available for testing")
+        
+        # Test 3: News analysis without premium (should fail)
+        if hasattr(self, 'test_news_id') and self.test_news_id and self.token:
+            success, error_response = self.run_test(
+                "News Analysis Without Premium",
+                "POST",
+                f"news/analyze/{self.test_news_id}",
+                403
+            )
+            if success:
+                self.log_result("News Analysis Premium Protection", True)
+                print("   ✓ News analysis properly protected for premium users")
+        
+        # Test 4: News refresh without premium (should fail)
+        if self.token:
+            success, error_response = self.run_test(
+                "News Refresh Without Premium",
+                "POST",
+                "news/refresh",
+                403
+            )
+            if success:
+                self.log_result("News Refresh Premium Protection", True)
+                print("   ✓ News refresh properly protected for premium users")
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Prophecy News Study Bible API Tests")
