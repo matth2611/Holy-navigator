@@ -68,11 +68,7 @@ const AppContent = () => {
           } />
           
           {/* Premium Routes */}
-          <Route path="/news-analysis" element={
-            <PremiumRoute>
-              <NewsAnalysisPage />
-            </PremiumRoute>
-          } />
+          <Route path="/news-analysis" element={<NewsAnalysisPage />} />
           <Route path="/forum" element={
             <PremiumRoute>
               <ForumPage />
