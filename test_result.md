@@ -246,11 +246,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/news/daily fetches from Google News RSS, caches in MongoDB. POST /api/news/analyze/{news_id} analyzes specific story with LLM."
+      - working: true
+        agent: "testing"
+        comment: "✅ DAILY NEWS API FULLY FUNCTIONAL: GET /api/news/daily returns today's news stories (9 stories found) with proper structure including news_id, title, source, description, link, and category. Categories include world, middle_east, disasters as expected. POST /api/news/analyze/{news_id} successfully analyzes news stories with scripture references (4 references found), analysis content (1139 characters), spiritual application, and prophetic significance using GPT-5.2. POST /api/news/refresh successfully refreshes news for premium users. All endpoints properly protected - analysis and refresh require premium subscription. Fixed LLM response handling issue. Public access to daily news working correctly, premium features properly gated."
 
 frontend:
   - task: "Daily News UI"
