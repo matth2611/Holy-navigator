@@ -25,6 +25,7 @@ db = client[os.environ['DB_NAME']]
 # Environment variables
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default_secret')
 
 app = FastAPI()
