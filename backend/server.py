@@ -1476,7 +1476,11 @@ async def stripe_webhook(request: Request):
     signature = request.headers.get("Stripe-Signature")
     
     webhook_url = f"{str(request.base_url).rstrip('/')}/api/webhook/stripe"
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    stripe_checkout = StripeCheckout(
+        api_key=STRIPE_API_KEY, 
+        webhook_url=webhook_url,
+        webhook_secret=STRIPE_WEBHOOK_SECRET
+    )
     
     try:
         webhook_response = await stripe_checkout.handle_webhook(body, signature)
@@ -1493,6 +1497,8 @@ async def stripe_webhook(request: Request):
                     {"session_id": webhook_response.session_id},
                     {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
                 )
+                
+                logger.info(f"User {user_id} upgraded to premium via Stripe webhook")
         
         return {"status": "success"}
     except Exception as e:
