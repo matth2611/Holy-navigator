@@ -27,15 +27,15 @@ const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 const categoryIcons = {
   world: Globe,
   middle_east: MapPin,
-  disasters: Cloud,
-  politics: Landmark
+  politics: Landmark,
+  science: Sparkles
 };
 
 const categoryLabels = {
   world: 'World News',
   middle_east: 'Middle East',
-  disasters: 'Disasters & Climate',
-  politics: 'Politics'
+  politics: 'Politics',
+  science: 'Science & Environment'
 };
 
 const NewsAnalysisPage = () => {
