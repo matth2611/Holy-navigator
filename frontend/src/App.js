@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './contexts/AuthContext';
@@ -27,6 +27,17 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 import './App.css';
 
+// ScrollToTop component - scrolls to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
+  
+  return null;
+};
+
 const AppContent = () => {
   const location = useLocation();
   
@@ -39,6 +50,7 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       {!hideNavFooter && <Navbar />}
       <main className="flex-1">
         <Routes>
