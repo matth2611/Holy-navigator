@@ -44,7 +44,9 @@ const NewsAnalysisPage = () => {
   const [content, setContent] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzingNewsId, setAnalyzingNewsId] = useState(null);
+  const [loadingScriptureId, setLoadingScriptureId] = useState(null);
   const [result, setResult] = useState(null);
+  const [scriptureResult, setScriptureResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [dailyNews, setDailyNews] = useState([]);
