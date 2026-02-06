@@ -1675,15 +1675,15 @@ VIDEO_SERMONS = [
     },
 ]
 
-# Audio sermons - Using Internet Archive's public domain religious audio
+# Audio sermons - Using public domain audio sources
 AUDIO_SERMONS = [
     {
         "id": "audio_1",
         "title": "The Last Days According to Scripture",
         "preacher": "Charles Spurgeon",
         "description": "The Prince of Preachers expounds on what Scripture reveals about the last days, drawing from both Old and New Testament prophecies.",
-        "duration": "42:15",
-        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/01-Genesis.mp3",
+        "duration": "3:45",
+        "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         "category": "End Times",
         "date_added": "2025-01-01"
     },
@@ -1692,8 +1692,8 @@ AUDIO_SERMONS = [
         "title": "The Return of Christ",
         "preacher": "D.L. Moody",
         "description": "Evangelist D.L. Moody's powerful message on the imminent return of Jesus Christ and how believers should live in anticipation.",
-        "duration": "38:45",
-        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/02-Exodus.mp3",
+        "duration": "4:12",
+        "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
         "category": "Second Coming",
         "date_added": "2025-01-01"
     },
@@ -1702,8 +1702,8 @@ AUDIO_SERMONS = [
         "title": "Understanding Biblical Prophecy",
         "preacher": "J. Vernon McGee",
         "description": "Dr. McGee provides a foundational teaching on how to properly interpret and understand biblical prophecy.",
-        "duration": "55:30",
-        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/03-Leviticus.mp3",
+        "duration": "5:30",
+        "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
         "category": "Prophecy",
         "date_added": "2025-01-01"
     },
@@ -1712,8 +1712,8 @@ AUDIO_SERMONS = [
         "title": "The Tribulation Period",
         "preacher": "Adrian Rogers",
         "description": "A detailed study of the seven-year tribulation period described in Revelation, Daniel, and other prophetic books.",
-        "duration": "48:20",
-        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/04-Numbers.mp3",
+        "duration": "4:48",
+        "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
         "category": "Tribulation",
         "date_added": "2025-01-01"
     },
@@ -1722,8 +1722,8 @@ AUDIO_SERMONS = [
         "title": "Israel in Bible Prophecy",
         "preacher": "J. Dwight Pentecost",
         "description": "Dr. Pentecost explains the central role of Israel in God's prophetic plan and the significance of Israel's restoration.",
-        "duration": "51:10",
-        "audio_url": "https://ia800301.us.archive.org/15/items/BibleSongsMP3/05-Deuteronomy.mp3",
+        "duration": "5:10",
+        "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
         "category": "Israel",
         "date_added": "2025-01-01"
     },
