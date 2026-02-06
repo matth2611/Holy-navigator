@@ -251,7 +251,28 @@ const NewsAnalysisPage = () => {
                           {news.description}
                         </p>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => getScripture(news.news_id)}
+                            disabled={loadingScriptureId === news.news_id}
+                            className="text-xs"
+                            data-testid={`scripture-news-${news.news_id}`}
+                          >
+                            {loadingScriptureId === news.news_id ? (
+                              <>
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                Loading...
+                              </>
+                            ) : (
+                              <>
+                                <BookOpen className="w-3 h-3 mr-1" />
+                                Scripture
+                              </>
+                            )}
+                          </Button>
+                          
                           <Button
                             size="sm"
                             onClick={() => analyzeNewsStory(news.news_id)}
@@ -266,8 +287,9 @@ const NewsAnalysisPage = () => {
                               </>
                             ) : (
                               <>
-                                <BookOpen className="w-3 h-3 mr-1" />
-                                Find Scripture
+                                <Sparkles className="w-3 h-3 mr-1" />
+                                Analyze
+                                {!isPremium && <span className="ml-1 text-[10px] opacity-70">PRO</span>}
                               </>
                             )}
                           </Button>
@@ -285,7 +307,7 @@ const NewsAnalysisPage = () => {
                                 rel="noopener noreferrer"
                               >
                                 <ExternalLink className="w-3 h-3 mr-1" />
-                                Source Article
+                                Source
                               </a>
                             </Button>
                           )}
