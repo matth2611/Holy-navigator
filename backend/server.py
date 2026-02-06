@@ -1899,10 +1899,17 @@ async def health_check():
 # Include router
 app.include_router(api_router)
 
+# CORS configuration - need explicit origins when using credentials
+cors_origins_str = os.environ.get('CORS_ORIGINS', '')
+if cors_origins_str and cors_origins_str != '*':
+    cors_origins = [o.strip() for o in cors_origins_str.split(',') if o.strip()]
+else:
+    cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_credentials=True if cors_origins != ["*"] else False,
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
