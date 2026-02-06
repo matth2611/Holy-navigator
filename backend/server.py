@@ -1155,7 +1155,7 @@ async def get_daily_news(request: Request):
         return {"date": today, "stories": cached["stories"], "cached": True}
     
     # Fetch fresh news
-    news_stories = await fetch_google_news()
+    news_stories = await fetch_news()
     
     if news_stories:
         # Store in database
