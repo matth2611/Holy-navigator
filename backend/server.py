@@ -1877,9 +1877,10 @@ async def get_media_history(request: Request):
 
 class NotificationPreferences(BaseModel):
     daily_devotional: bool = True
+    daily_news: bool = True
     reading_plan_reminder: bool = True
     weekly_sermon_updates: bool = True
-    reminder_time: Optional[str] = "08:00"  # HH:MM format
+    reminder_time: Optional[str] = "07:00"  # HH:MM format
 
 @api_router.get("/notifications/preferences")
 async def get_notification_preferences(request: Request):
@@ -1896,9 +1897,10 @@ async def get_notification_preferences(request: Request):
         prefs = {
             "user_id": user["user_id"],
             "daily_devotional": True,
+            "daily_news": True,
             "reading_plan_reminder": True,
             "weekly_sermon_updates": True,
-            "reminder_time": "08:00"
+            "reminder_time": "07:00"
         }
     
     return prefs
@@ -1912,6 +1914,7 @@ async def update_notification_preferences(prefs: NotificationPreferences, reques
         {"user_id": user["user_id"]},
         {"$set": {
             "daily_devotional": prefs.daily_devotional,
+            "daily_news": prefs.daily_news,
             "reading_plan_reminder": prefs.reading_plan_reminder,
             "weekly_sermon_updates": prefs.weekly_sermon_updates,
             "reminder_time": prefs.reminder_time,
@@ -1921,6 +1924,182 @@ async def update_notification_preferences(prefs: NotificationPreferences, reques
     )
     
     return {"message": "Notification preferences updated"}
+
+# ==================== PUSH NOTIFICATIONS ====================
+
+@api_router.get("/push/vapid-key")
+async def get_vapid_key():
+    """Get VAPID public key for push subscription"""
+    return {"publicKey": VAPID_PUBLIC_KEY}
+
+@api_router.post("/push/subscribe")
+async def subscribe_push(subscription: PushSubscription, request: Request):
+    """Subscribe to push notifications (Premium only)"""
+    user = await get_premium_user(request)
+    
+    # Store subscription
+    await db.push_subscriptions.update_one(
+        {"user_id": user["user_id"]},
+        {"$set": {
+            "user_id": user["user_id"],
+            "endpoint": subscription.endpoint,
+            "keys": subscription.keys,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    logger.info(f"Push subscription added for user {user['user_id']}")
+    return {"message": "Successfully subscribed to push notifications"}
+
+@api_router.delete("/push/unsubscribe")
+async def unsubscribe_push(request: Request):
+    """Unsubscribe from push notifications"""
+    user = await get_current_user(request)
+    
+    await db.push_subscriptions.delete_one({"user_id": user["user_id"]})
+    return {"message": "Successfully unsubscribed from push notifications"}
+
+@api_router.get("/push/status")
+async def get_push_status(request: Request):
+    """Check if user is subscribed to push notifications"""
+    user = await get_current_user(request)
+    
+    subscription = await db.push_subscriptions.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "endpoint": 1}
+    )
+    
+    return {"subscribed": subscription is not None}
+
+async def send_push_notification(user_id: str, title: str, body: str, url: str = "/news-analysis"):
+    """Send push notification to a specific user"""
+    subscription = await db.push_subscriptions.find_one({"user_id": user_id})
+    
+    if not subscription or not VAPID_PRIVATE_KEY:
+        return False
+    
+    try:
+        payload = json.dumps({
+            "title": title,
+            "body": body,
+            "icon": "/logo192.png",
+            "badge": "/logo192.png",
+            "url": url,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        
+        webpush(
+            subscription_info={
+                "endpoint": subscription["endpoint"],
+                "keys": subscription["keys"]
+            },
+            data=payload,
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims={"sub": VAPID_EMAIL}
+        )
+        logger.info(f"Push notification sent to user {user_id}")
+        return True
+    except WebPushException as e:
+        logger.error(f"Push notification failed for {user_id}: {e}")
+        # Remove invalid subscription
+        if e.response and e.response.status_code in [404, 410]:
+            await db.push_subscriptions.delete_one({"user_id": user_id})
+        return False
+
+async def send_daily_news_notifications():
+    """Send daily news notification to all subscribed premium users at 7am"""
+    logger.info("Starting daily news notification job...")
+    
+    # Get today's news
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    daily_news = await db.daily_news.find_one({"date": today}, {"_id": 0})
+    
+    if not daily_news or not daily_news.get("stories"):
+        # Fetch fresh news
+        news_stories = await fetch_news()
+        if news_stories:
+            await db.daily_news.update_one(
+                {"date": today},
+                {"$set": {"date": today, "stories": news_stories}},
+                upsert=True
+            )
+            daily_news = {"stories": news_stories}
+    
+    if not daily_news or not daily_news.get("stories"):
+        logger.warning("No news available for daily notification")
+        return
+    
+    # Get first news story
+    news_story = daily_news["stories"][0]
+    
+    # Get all push subscriptions for premium users
+    subscriptions = await db.push_subscriptions.find({}, {"_id": 0}).to_list(1000)
+    
+    sent_count = 0
+    for sub in subscriptions:
+        user_id = sub.get("user_id")
+        
+        # Check if user is still premium
+        user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+        if not user or not user.get("is_premium"):
+            continue
+        
+        # Check notification preferences
+        prefs = await db.notification_preferences.find_one({"user_id": user_id})
+        if prefs and not prefs.get("daily_news", True):
+            continue
+        
+        # Send notification
+        success = await send_push_notification(
+            user_id=user_id,
+            title="📰 Today's News",
+            body=f"{news_story['title'][:100]}... - Discover the biblical connection!",
+            url="/news-analysis"
+        )
+        if success:
+            sent_count += 1
+    
+    logger.info(f"Daily news notifications sent to {sent_count} users")
+
+# Initialize scheduler
+scheduler = AsyncIOScheduler()
+
+@app.on_event("startup")
+async def start_scheduler():
+    """Start the notification scheduler on app startup"""
+    # Schedule daily news notification at 7:00 AM UTC
+    scheduler.add_job(
+        send_daily_news_notifications,
+        CronTrigger(hour=7, minute=0),
+        id="daily_news_notification",
+        replace_existing=True
+    )
+    scheduler.start()
+    logger.info("Push notification scheduler started - daily news at 7:00 AM UTC")
+
+@app.on_event("shutdown")
+async def stop_scheduler():
+    """Stop the scheduler on app shutdown"""
+    scheduler.shutdown()
+
+# Manual trigger endpoint for testing
+@api_router.post("/push/test")
+async def test_push_notification(request: Request):
+    """Send a test push notification (Premium only)"""
+    user = await get_premium_user(request)
+    
+    success = await send_push_notification(
+        user_id=user["user_id"],
+        title="🔔 Test Notification",
+        body="Push notifications are working! You'll receive daily news at 7am.",
+        url="/news-analysis"
+    )
+    
+    if success:
+        return {"message": "Test notification sent successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="No push subscription found or notification failed")
 
 # ==================== HEALTH CHECK ====================
 
