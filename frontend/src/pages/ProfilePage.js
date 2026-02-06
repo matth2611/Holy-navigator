@@ -330,6 +330,91 @@ const ProfilePage = () => {
               </h3>
               
               <div className="space-y-4">
+                {/* Push Notifications - Premium Feature */}
+                {isPremium && pushSupported && (
+                  <div className="bg-gradient-to-r from-[#0A2463]/5 to-[#C5A059]/5 border border-[#C5A059]/20 rounded-xl p-4 mb-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-lg bg-[#C5A059]/10">
+                          <BellRing className="w-5 h-5 text-[#C5A059]" />
+                        </div>
+                        <div>
+                          <p className="font-medium flex items-center gap-2">
+                            Daily News Push Notifications
+                            <span className="premium-badge text-xs">Premium</span>
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Receive a news headline with biblical relevance every day at 7:00 AM
+                          </p>
+                          {pushPermission === 'denied' && (
+                            <p className="text-xs text-red-500 mt-2">
+                              Notifications blocked. Please enable them in your browser settings.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        {pushLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-[#C5A059]" />
+                        ) : (
+                          <Switch
+                            checked={pushSubscribed}
+                            onCheckedChange={async (checked) => {
+                              try {
+                                if (checked) {
+                                  await subscribePush();
+                                  toast.success('Push notifications enabled! You\'ll receive daily news at 7am.');
+                                } else {
+                                  await unsubscribePush();
+                                  toast.success('Push notifications disabled');
+                                }
+                              } catch (error) {
+                                toast.error(error.message || 'Failed to update push notifications');
+                              }
+                            }}
+                            disabled={pushPermission === 'denied'}
+                            data-testid="push-notification-switch"
+                          />
+                        )}
+                        {pushSubscribed && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                await sendTestNotification();
+                                toast.success('Test notification sent!');
+                              } catch (error) {
+                                toast.error('Failed to send test notification');
+                              }
+                            }}
+                            className="text-xs"
+                            data-testid="test-push-btn"
+                          >
+                            <Smartphone className="w-3 h-3 mr-1" />
+                            Test
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Non-premium push notification promo */}
+                {!isPremium && pushSupported && (
+                  <div className="bg-muted/30 border border-border/40 rounded-xl p-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <BellRing className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium text-muted-foreground">Daily News Notifications</p>
+                        <p className="text-sm text-muted-foreground">
+                          Upgrade to Premium to receive daily news headlines with biblical connections.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Daily Devotional Reminder</p>
@@ -339,6 +424,18 @@ const ProfilePage = () => {
                     checked={notificationPrefs.daily_devotional}
                     onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, daily_devotional: checked })}
                     data-testid="devotional-reminder-switch"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Daily News Updates</p>
+                    <p className="text-sm text-muted-foreground">Include news in your daily notifications</p>
+                  </div>
+                  <Switch
+                    checked={notificationPrefs.daily_news}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, daily_news: checked })}
+                    data-testid="daily-news-switch"
                   />
                 </div>
                 
