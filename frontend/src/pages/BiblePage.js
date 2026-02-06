@@ -128,6 +128,8 @@ const BiblePage = () => {
     setCurrentChapter(chapterNum);
     navigate(`/bible/${encodeURIComponent(bookName)}/${chapterNum}`);
     setSidebarOpen(false);
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const goToPrevious = () => {
