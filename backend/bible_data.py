@@ -210,6 +210,349 @@ EXTENDED_BIBLE_DICTIONARY = {
         "greek": "propheteia (προφητεία)",
         "references": ["2 Peter 1:20-21", "1 Corinthians 14:3", "Revelation 19:10"]
     },
+    "apostle": {
+        "word": "Apostle",
+        "definition": "One who is sent out as a messenger or ambassador. The twelve disciples chosen by Jesus and others sent with special authority.",
+        "hebrew": "shaliach (שָׁלִיחַ)",
+        "greek": "apostolos (ἀπόστολος)",
+        "references": ["Matthew 10:2", "Ephesians 4:11", "Acts 1:26"]
+    },
+    "disciple": {
+        "word": "Disciple",
+        "definition": "A learner or follower. One who follows the teachings of a master, specifically followers of Jesus Christ.",
+        "hebrew": "talmid (תַּלְמִיד)",
+        "greek": "mathetes (μαθητής)",
+        "references": ["Matthew 28:19", "John 8:31", "Acts 11:26"]
+    },
+    "glory": {
+        "word": "Glory",
+        "definition": "The visible manifestation of God's presence, majesty, and splendor. The weightiness of God's character.",
+        "hebrew": "kavod (כָּבוֹד)",
+        "greek": "doxa (δόξα)",
+        "references": ["Exodus 33:18", "John 1:14", "Romans 8:18"]
+    },
+    "worship": {
+        "word": "Worship",
+        "definition": "The act of ascribing worth to God. Reverent honor and homage paid to God through praise, prayer, and obedience.",
+        "hebrew": "shachah (שָׁחָה)",
+        "greek": "proskyneo (προσκυνέω)",
+        "references": ["John 4:24", "Psalm 95:6", "Romans 12:1"]
+    },
+    "prayer": {
+        "word": "Prayer",
+        "definition": "Communication with God. Speaking to and listening to the Lord, including praise, thanksgiving, confession, and petition.",
+        "hebrew": "tefillah (תְּפִלָּה)",
+        "greek": "proseuche (προσευχή)",
+        "references": ["Philippians 4:6", "1 Thessalonians 5:17", "Matthew 6:9-13"]
+    },
+    "praise": {
+        "word": "Praise",
+        "definition": "The expression of approval, admiration, and thanksgiving to God for His character and works.",
+        "hebrew": "tehillah (תְּהִלָּה)",
+        "greek": "ainesis (αἴνεσις)",
+        "references": ["Psalm 150:6", "Hebrews 13:15", "Psalm 100:4"]
+    },
+    "angel": {
+        "word": "Angel",
+        "definition": "A spiritual being created by God to serve Him and minister to believers. Messengers of God.",
+        "hebrew": "malak (מַלְאָךְ)",
+        "greek": "angelos (ἄγγελος)",
+        "references": ["Hebrews 1:14", "Psalm 91:11", "Luke 1:26"]
+    },
+    "demon": {
+        "word": "Demon",
+        "definition": "An evil spirit opposed to God and His people. Fallen angels who follow Satan.",
+        "hebrew": "shed (שֵׁד)",
+        "greek": "daimonion (δαιμόνιον)",
+        "references": ["James 2:19", "Ephesians 6:12", "Mark 5:9"]
+    },
+    "satan": {
+        "word": "Satan",
+        "definition": "The adversary. The chief enemy of God and His people, also called the devil, the accuser, and the tempter.",
+        "hebrew": "satan (שָׂטָן)",
+        "greek": "satanas (σατανᾶς)",
+        "references": ["1 Peter 5:8", "Revelation 12:9", "Job 1:6"]
+    },
+    "heaven": {
+        "word": "Heaven",
+        "definition": "The dwelling place of God. The eternal home of believers and the place of God's throne.",
+        "hebrew": "shamayim (שָׁמַיִם)",
+        "greek": "ouranos (οὐρανός)",
+        "references": ["John 14:2-3", "Revelation 21:1", "Matthew 6:9"]
+    },
+    "hell": {
+        "word": "Hell",
+        "definition": "The place of eternal punishment and separation from God for the unrighteous.",
+        "hebrew": "sheol (שְׁאוֹל) / gehinnom (גֵּיהִנֹּם)",
+        "greek": "hades (ᾅδης) / gehenna (γέεννα)",
+        "references": ["Matthew 25:46", "Revelation 20:15", "Mark 9:43"]
+    },
+    "judgment": {
+        "word": "Judgment",
+        "definition": "God's evaluation and verdict on human conduct. The final accounting when all will stand before God.",
+        "hebrew": "mishpat (מִשְׁפָּט)",
+        "greek": "krisis (κρίσις)",
+        "references": ["Hebrews 9:27", "2 Corinthians 5:10", "Revelation 20:12"]
+    },
+    "parable": {
+        "word": "Parable",
+        "definition": "A short story or comparison used to illustrate a spiritual truth. Jesus' primary teaching method.",
+        "hebrew": "mashal (מָשָׁל)",
+        "greek": "parabole (παραβολή)",
+        "references": ["Matthew 13:34", "Mark 4:33-34", "Luke 15:3"]
+    },
+    "miracle": {
+        "word": "Miracle",
+        "definition": "A supernatural act of God that transcends natural laws. Signs and wonders that demonstrate God's power.",
+        "hebrew": "nes (נֵס) / mofet (מוֹפֵת)",
+        "greek": "dynamis (δύναμις) / semeion (σημεῖον)",
+        "references": ["John 2:11", "Acts 2:22", "Hebrews 2:4"]
+    },
+    "blessing": {
+        "word": "Blessing",
+        "definition": "God's favor and goodness bestowed upon His people. To speak well of or confer prosperity upon.",
+        "hebrew": "berakah (בְּרָכָה)",
+        "greek": "eulogia (εὐλογία)",
+        "references": ["Numbers 6:24-26", "Ephesians 1:3", "Genesis 12:2"]
+    },
+    "curse": {
+        "word": "Curse",
+        "definition": "The pronouncement of judgment or harm. The opposite of blessing, often resulting from disobedience.",
+        "hebrew": "qelalah (קְלָלָה)",
+        "greek": "katara (κατάρα)",
+        "references": ["Galatians 3:13", "Deuteronomy 28:15", "Genesis 3:17"]
+    },
+    "altar": {
+        "word": "Altar",
+        "definition": "A raised structure for offering sacrifices to God. A place of worship and dedication.",
+        "hebrew": "mizbeach (מִזְבֵּחַ)",
+        "greek": "thusiasterion (θυσιαστήριον)",
+        "references": ["Genesis 8:20", "Hebrews 13:10", "1 Kings 18:30"]
+    },
+    "sacrifice": {
+        "word": "Sacrifice",
+        "definition": "An offering to God, especially of an animal's life. Christ's ultimate sacrifice fulfilled all Old Testament requirements.",
+        "hebrew": "zebach (זֶבַח)",
+        "greek": "thysia (θυσία)",
+        "references": ["Hebrews 10:12", "Romans 12:1", "Leviticus 1:3"]
+    },
+    "priest": {
+        "word": "Priest",
+        "definition": "One who mediates between God and people. Christ is our eternal High Priest; all believers are a royal priesthood.",
+        "hebrew": "kohen (כֹּהֵן)",
+        "greek": "hiereus (ἱερεύς)",
+        "references": ["Hebrews 4:14-16", "1 Peter 2:9", "Exodus 28:1"]
+    },
+    "temple": {
+        "word": "Temple",
+        "definition": "God's dwelling place. The physical structure in Jerusalem and the spiritual temple of believers' bodies.",
+        "hebrew": "hekal (הֵיכָל) / bayit (בַּיִת)",
+        "greek": "naos (ναός) / hieron (ἱερόν)",
+        "references": ["1 Corinthians 6:19", "John 2:19-21", "1 Kings 8:10-11"]
+    },
+    "sabbath": {
+        "word": "Sabbath",
+        "definition": "The seventh day of rest. A day set apart for worship and cessation from work, pointing to our rest in Christ.",
+        "hebrew": "shabbat (שַׁבָּת)",
+        "greek": "sabbaton (σάββατον)",
+        "references": ["Exodus 20:8-11", "Hebrews 4:9-10", "Mark 2:27"]
+    },
+    "passover": {
+        "word": "Passover",
+        "definition": "The Jewish feast commemorating Israel's deliverance from Egypt. Christ is our Passover lamb.",
+        "hebrew": "pesach (פֶּסַח)",
+        "greek": "pascha (πάσχα)",
+        "references": ["Exodus 12:11", "1 Corinthians 5:7", "John 1:29"]
+    },
+    "communion": {
+        "word": "Communion",
+        "definition": "The Lord's Supper. The sharing of bread and wine in remembrance of Christ's body and blood.",
+        "hebrew": "N/A (New Testament practice)",
+        "greek": "koinonia (κοινωνία)",
+        "references": ["1 Corinthians 11:23-26", "Luke 22:19-20", "Acts 2:42"]
+    },
+    "tithe": {
+        "word": "Tithe",
+        "definition": "A tenth part given to God. An offering of the first portion acknowledging God's ownership of all.",
+        "hebrew": "maaser (מַעֲשֵׂר)",
+        "greek": "dekate (δεκάτη)",
+        "references": ["Malachi 3:10", "Genesis 14:20", "Matthew 23:23"]
+    },
+    "steward": {
+        "word": "Steward",
+        "definition": "A manager of another's property. Believers are stewards of God's gifts, time, and resources.",
+        "hebrew": "N/A",
+        "greek": "oikonomos (οἰκονόμος)",
+        "references": ["1 Peter 4:10", "1 Corinthians 4:2", "Luke 16:1-2"]
+    },
+    "wisdom": {
+        "word": "Wisdom",
+        "definition": "The ability to apply knowledge rightly. Godly wisdom begins with the fear of the Lord.",
+        "hebrew": "chokmah (חָכְמָה)",
+        "greek": "sophia (σοφία)",
+        "references": ["Proverbs 9:10", "James 1:5", "1 Corinthians 1:30"]
+    },
+    "truth": {
+        "word": "Truth",
+        "definition": "That which conforms to reality and God's nature. Jesus is the truth; God's Word is truth.",
+        "hebrew": "emet (אֱמֶת)",
+        "greek": "aletheia (ἀλήθεια)",
+        "references": ["John 14:6", "John 17:17", "John 8:32"]
+    },
+    "righteousness": {
+        "word": "Righteousness",
+        "definition": "Conformity to God's standard. Right standing with God through Christ's imputed righteousness.",
+        "hebrew": "tsedaqah (צְדָקָה)",
+        "greek": "dikaiosyne (δικαιοσύνη)",
+        "references": ["Romans 3:22", "2 Corinthians 5:21", "Matthew 6:33"]
+    },
+    "obedience": {
+        "word": "Obedience",
+        "definition": "Compliance with God's commands. Faith expressed through action and submission to God's will.",
+        "hebrew": "shama (שָׁמַע)",
+        "greek": "hypakoe (ὑπακοή)",
+        "references": ["1 Samuel 15:22", "John 14:15", "Romans 6:16"]
+    },
+    "testimony": {
+        "word": "Testimony",
+        "definition": "A declaration of truth. Personal witness to God's work and the collective witness of Scripture.",
+        "hebrew": "edut (עֵדוּת)",
+        "greek": "martyria (μαρτυρία)",
+        "references": ["Revelation 12:11", "Psalm 119:2", "John 21:24"]
+    },
+    "inheritance": {
+        "word": "Inheritance",
+        "definition": "What is received from ancestors or as a gift. Believers inherit eternal life and all spiritual blessings.",
+        "hebrew": "nachalah (נַחֲלָה)",
+        "greek": "kleronomia (κληρονομία)",
+        "references": ["1 Peter 1:4", "Ephesians 1:11", "Colossians 3:24"]
+    },
+    "election": {
+        "word": "Election",
+        "definition": "God's sovereign choice of individuals for salvation. Divine selection based on God's grace, not human merit.",
+        "hebrew": "bachar (בָּחַר)",
+        "greek": "ekloge (ἐκλογή)",
+        "references": ["Ephesians 1:4", "Romans 9:11", "1 Peter 2:9"]
+    },
+    "predestination": {
+        "word": "Predestination",
+        "definition": "God's sovereign determination of events before they occur. His eternal plan for His chosen ones.",
+        "hebrew": "N/A (theological term)",
+        "greek": "proorizo (προορίζω)",
+        "references": ["Romans 8:29-30", "Ephesians 1:5", "Ephesians 1:11"]
+    },
+    "sovereignty": {
+        "word": "Sovereignty",
+        "definition": "God's supreme authority and control over all creation. His absolute right to rule as He sees fit.",
+        "hebrew": "memshalah (מֶמְשָׁלָה)",
+        "greek": "pantokrator (παντοκράτωρ)",
+        "references": ["Daniel 4:35", "Psalm 115:3", "Isaiah 46:10"]
+    },
+    "omniscience": {
+        "word": "Omniscience",
+        "definition": "God's attribute of knowing all things - past, present, and future. Complete and perfect knowledge.",
+        "hebrew": "N/A (theological term)",
+        "greek": "N/A (theological term)",
+        "references": ["Psalm 139:1-4", "1 John 3:20", "Isaiah 46:10"]
+    },
+    "omnipotence": {
+        "word": "Omnipotence",
+        "definition": "God's attribute of being all-powerful. He can do anything consistent with His nature.",
+        "hebrew": "El Shaddai (אֵל שַׁדַּי)",
+        "greek": "pantokrator (παντοκράτωρ)",
+        "references": ["Jeremiah 32:17", "Matthew 19:26", "Revelation 19:6"]
+    },
+    "omnipresence": {
+        "word": "Omnipresence",
+        "definition": "God's attribute of being present everywhere simultaneously. No place is outside His presence.",
+        "hebrew": "N/A (theological term)",
+        "greek": "N/A (theological term)",
+        "references": ["Psalm 139:7-10", "Jeremiah 23:24", "Acts 17:27-28"]
+    },
+    "immutability": {
+        "word": "Immutability",
+        "definition": "God's unchanging nature. He does not change in His being, purposes, or promises.",
+        "hebrew": "N/A (theological term)",
+        "greek": "N/A (theological term)",
+        "references": ["Malachi 3:6", "James 1:17", "Hebrews 13:8"]
+    },
+    "inerrancy": {
+        "word": "Inerrancy",
+        "definition": "The doctrine that Scripture, in its original manuscripts, is without error in all it affirms.",
+        "hebrew": "N/A (theological term)",
+        "greek": "N/A (theological term)",
+        "references": ["2 Timothy 3:16", "Proverbs 30:5", "Psalm 12:6"]
+    },
+    "inspiration": {
+        "word": "Inspiration",
+        "definition": "The supernatural influence of the Holy Spirit on Scripture writers, ensuring accuracy and authority.",
+        "hebrew": "N/A (theological term)",
+        "greek": "theopneustos (θεόπνευστος)",
+        "references": ["2 Timothy 3:16", "2 Peter 1:21", "1 Corinthians 2:13"]
+    },
+    "revelation": {
+        "word": "Revelation",
+        "definition": "God's disclosure of Himself and His truth to humanity. General revelation through nature and special revelation through Scripture.",
+        "hebrew": "galah (גָּלָה)",
+        "greek": "apokalypsis (ἀποκάλυψις)",
+        "references": ["Hebrews 1:1-2", "Romans 1:20", "Revelation 1:1"]
+    },
+    "incarnation": {
+        "word": "Incarnation",
+        "definition": "God becoming flesh in Jesus Christ. The eternal Son taking on human nature.",
+        "hebrew": "N/A (theological term)",
+        "greek": "sarx (σάρξ)",
+        "references": ["John 1:14", "Philippians 2:6-8", "1 Timothy 3:16"]
+    },
+    "virgin birth": {
+        "word": "Virgin Birth",
+        "definition": "The miraculous conception of Jesus by the Holy Spirit in the virgin Mary, without human father.",
+        "hebrew": "almah (עַלְמָה)",
+        "greek": "parthenos (παρθένος)",
+        "references": ["Isaiah 7:14", "Matthew 1:23", "Luke 1:34-35"]
+    },
+    "ascension": {
+        "word": "Ascension",
+        "definition": "Christ's bodily return to heaven after His resurrection, where He sits at the Father's right hand.",
+        "hebrew": "N/A",
+        "greek": "analepsis (ἀνάλημψις)",
+        "references": ["Acts 1:9-11", "Mark 16:19", "Ephesians 4:8-10"]
+    },
+    "intercession": {
+        "word": "Intercession",
+        "definition": "Praying on behalf of others. Christ continually intercedes for believers before the Father.",
+        "hebrew": "paga (פָּגַע)",
+        "greek": "entynchanō (ἐντυγχάνω)",
+        "references": ["Romans 8:34", "Hebrews 7:25", "Isaiah 53:12"]
+    },
+    "mediator": {
+        "word": "Mediator",
+        "definition": "One who intervenes between two parties. Christ is the sole mediator between God and humanity.",
+        "hebrew": "N/A",
+        "greek": "mesites (μεσίτης)",
+        "references": ["1 Timothy 2:5", "Hebrews 9:15", "Hebrews 12:24"]
+    },
+    "advocate": {
+        "word": "Advocate",
+        "definition": "One who pleads another's cause. Jesus is our advocate before the Father; the Holy Spirit is our Advocate on earth.",
+        "hebrew": "N/A",
+        "greek": "parakletos (παράκλητος)",
+        "references": ["1 John 2:1", "John 14:16", "John 14:26"]
+    },
+    "regeneration": {
+        "word": "Regeneration",
+        "definition": "The new birth. Being born again by the Holy Spirit, receiving new spiritual life.",
+        "hebrew": "N/A",
+        "greek": "palingenesia (παλιγγενεσία)",
+        "references": ["John 3:3-7", "Titus 3:5", "1 Peter 1:23"]
+    },
+    "perseverance": {
+        "word": "Perseverance",
+        "definition": "Continuing in faith despite difficulties. God preserves His people and they persist in faith to the end.",
+        "hebrew": "N/A",
+        "greek": "hypomone (ὑπομονή)",
+        "references": ["Philippians 1:6", "John 10:28-29", "Romans 8:38-39"]
+    },
 }
 
 # 365 Daily Devotionals for a full year
