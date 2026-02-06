@@ -1178,7 +1178,7 @@ async def refresh_daily_news(request: Request):
     user = await get_premium_user(request)
     
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    news_stories = await fetch_google_news()
+    news_stories = await fetch_news()
     
     if news_stories:
         await db.daily_news.update_one(
