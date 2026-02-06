@@ -1053,18 +1053,31 @@ async def upvote_comment(comment_id: str, request: Request):
         )
         return {"message": "Upvoted", "upvoted": True}
 
-# ==================== DAILY NEWS FROM GOOGLE NEWS ====================
+# ==================== DAILY NEWS ====================
 
 import feedparser
 import html
 import re
+import base64
 
-# Google News RSS Feed URLs for different categories
-GOOGLE_NEWS_FEEDS = {
-    "world": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en",
-    "middle_east": "https://news.google.com/rss/search?q=israel+OR+middle+east&hl=en-US&gl=US&ceid=US:en",
-    "disasters": "https://news.google.com/rss/search?q=earthquake+OR+hurricane+OR+flood+OR+disaster+OR+climate&hl=en-US&gl=US&ceid=US:en",
-    "politics": "https://news.google.com/rss/topics/CAAqIQgKIhtDQkFTRGdvSUwyMHZNR1Z4ZERBU0FtVnVLQUFQAQ?hl=en-US&gl=US&ceid=US:en"
+# Using multiple RSS feeds for reliable news with direct links
+NEWS_FEEDS = {
+    "world": [
+        "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+        "https://feeds.bbci.co.uk/news/world/rss.xml"
+    ],
+    "middle_east": [
+        "https://rss.nytimes.com/services/xml/rss/nyt/MiddleEast.xml",
+        "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml"
+    ],
+    "politics": [
+        "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml",
+        "https://feeds.bbci.co.uk/news/politics/rss.xml"
+    ],
+    "science": [
+        "https://rss.nytimes.com/services/xml/rss/nyt/Science.xml",
+        "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml"
+    ]
 }
 
 def clean_html(text):
@@ -1072,50 +1085,61 @@ def clean_html(text):
     clean = re.sub(r'<[^>]+>', '', text)
     return html.unescape(clean).strip()
 
-def extract_source_from_title(title):
-    """Extract source name from Google News title format 'Title - Source'"""
-    if ' - ' in title:
-        parts = title.rsplit(' - ', 1)
-        return parts[0].strip(), parts[1].strip()
-    return title, "Unknown"
+def extract_source_from_url(url):
+    """Extract source name from URL"""
+    if 'nytimes.com' in url:
+        return 'New York Times'
+    elif 'bbc.co.uk' in url or 'bbc.com' in url:
+        return 'BBC News'
+    elif 'reuters.com' in url:
+        return 'Reuters'
+    elif 'apnews.com' in url:
+        return 'AP News'
+    return 'News Source'
 
-async def fetch_google_news():
-    """Fetch news from Google News RSS feeds"""
+async def fetch_news():
+    """Fetch news from RSS feeds with direct article links"""
     all_news = []
     seen_titles = set()
     
     async with httpx.AsyncClient(timeout=30.0) as client:
-        for category, feed_url in GOOGLE_NEWS_FEEDS.items():
-            try:
-                response = await client.get(feed_url)
-                if response.status_code == 200:
-                    feed = feedparser.parse(response.text)
-                    
-                    for entry in feed.entries[:3]:  # Get top 3 from each category
-                        title, source = extract_source_from_title(entry.get('title', ''))
+        for category, feed_urls in NEWS_FEEDS.items():
+            for feed_url in feed_urls:
+                try:
+                    response = await client.get(feed_url, follow_redirects=True)
+                    if response.status_code == 200:
+                        feed = feedparser.parse(response.text)
                         
-                        # Skip duplicates
-                        if title in seen_titles:
-                            continue
-                        seen_titles.add(title)
-                        
-                        description = clean_html(entry.get('description', entry.get('summary', '')))
-                        
-                        news_item = {
-                            "news_id": f"news_{uuid.uuid4().hex[:12]}",
-                            "title": title,
-                            "source": source,
-                            "description": description[:500] if description else "",
-                            "link": entry.get('link', ''),
-                            "category": category,
-                            "published": entry.get('published', ''),
-                            "fetched_at": datetime.now(timezone.utc).isoformat()
-                        }
-                        all_news.append(news_item)
-                        
-            except Exception as e:
-                logger.error(f"Error fetching {category} news: {e}")
-                continue
+                        for entry in feed.entries[:2]:  # Get top 2 from each feed
+                            title = clean_html(entry.get('title', ''))
+                            
+                            # Skip duplicates
+                            if title in seen_titles or len(title) < 10:
+                                continue
+                            seen_titles.add(title)
+                            
+                            description = clean_html(entry.get('description', entry.get('summary', '')))
+                            link = entry.get('link', '')
+                            source = extract_source_from_url(link)
+                            
+                            news_item = {
+                                "news_id": f"news_{uuid.uuid4().hex[:12]}",
+                                "title": title,
+                                "source": source,
+                                "description": description[:500] if description else "",
+                                "link": link,
+                                "category": category,
+                                "published": entry.get('published', ''),
+                                "fetched_at": datetime.now(timezone.utc).isoformat()
+                            }
+                            all_news.append(news_item)
+                            
+                            if len(all_news) >= 12:  # Limit total
+                                return all_news
+                                
+                except Exception as e:
+                    logger.warning(f"Error fetching {feed_url}: {e}")
+                    continue
     
     return all_news
 
