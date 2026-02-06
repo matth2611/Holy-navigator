@@ -135,10 +135,15 @@ class NewsAnalysisResponse(BaseModel):
 class SubscriptionCreate(BaseModel):
     origin_url: str
 
+class PushSubscription(BaseModel):
+    endpoint: str
+    keys: Dict[str, str]
+
 class UserProfileUpdate(BaseModel):
     name: Optional[str] = None
     notification_email: Optional[bool] = None
     notification_forum: Optional[bool] = None
+    notification_push: Optional[bool] = None
     preferred_translation: Optional[str] = None
     theme_preference: Optional[str] = None
 
