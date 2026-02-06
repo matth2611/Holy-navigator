@@ -21,14 +21,18 @@ import {
   MessageSquare,
   Settings,
   Bell,
+  BellRing,
   Palette,
   Book,
   Calendar,
   Save,
-  Check
+  Check,
+  Loader2,
+  Smartphone
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate } from '../lib/utils';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
