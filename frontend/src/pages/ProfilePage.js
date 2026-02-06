@@ -37,7 +37,7 @@ import { usePushNotifications } from '../hooks/usePushNotifications';
 const API_URL = process.env.REACT_APP_BACKEND_URL + '/api';
 
 const ProfilePage = () => {
-  const { user, getAuthHeaders, isPremium, updateUser } = useAuth();
+  const { user, token, getAuthHeaders, isPremium, updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,10 +52,22 @@ const ProfilePage = () => {
   });
   const [notificationPrefs, setNotificationPrefs] = useState({
     daily_devotional: true,
+    daily_news: true,
     reading_plan_reminder: true,
     weekly_sermon_updates: true,
-    reminder_time: '08:00'
+    reminder_time: '07:00'
   });
+
+  // Push notification hook
+  const {
+    isSupported: pushSupported,
+    isSubscribed: pushSubscribed,
+    isLoading: pushLoading,
+    permission: pushPermission,
+    subscribe: subscribePush,
+    unsubscribe: unsubscribePush,
+    sendTestNotification
+  } = usePushNotifications(token, isPremium);
 
   useEffect(() => {
     fetchProfile();
