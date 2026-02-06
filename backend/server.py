@@ -1322,6 +1322,134 @@ Please provide relevant scripture references, analysis, and any prophetic signif
         logger.error(f"Analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
+# Scripture keyword mappings for quick lookup (no AI needed)
+SCRIPTURE_KEYWORDS = {
+    "war": [
+        {"reference": "Matthew 24:6-7", "text": "You will hear of wars and rumors of wars, but see to it that you are not alarmed. Such things must happen, but the end is still to come.", "theme": "End Times"},
+        {"reference": "Psalm 46:1-2", "text": "God is our refuge and strength, an ever-present help in trouble. Therefore we will not fear, though the earth give way.", "theme": "God's Protection"},
+        {"reference": "Isaiah 2:4", "text": "He will judge between the nations and will settle disputes for many peoples. They will beat their swords into plowshares.", "theme": "Future Peace"}
+    ],
+    "peace": [
+        {"reference": "John 14:27", "text": "Peace I leave with you; my peace I give you. I do not give to you as the world gives.", "theme": "Christ's Peace"},
+        {"reference": "Romans 12:18", "text": "If it is possible, as far as it depends on you, live at peace with everyone.", "theme": "Living Peacefully"},
+        {"reference": "Isaiah 9:6", "text": "For to us a child is born... And he will be called Wonderful Counselor, Mighty God, Everlasting Father, Prince of Peace.", "theme": "Messiah"}
+    ],
+    "israel": [
+        {"reference": "Genesis 12:3", "text": "I will bless those who bless you, and whoever curses you I will curse; and all peoples on earth will be blessed through you.", "theme": "Abrahamic Covenant"},
+        {"reference": "Ezekiel 37:21-22", "text": "I will take the Israelites out of the nations where they have gone. I will gather them from all around and bring them back into their own land.", "theme": "Restoration"},
+        {"reference": "Romans 11:26", "text": "And in this way all Israel will be saved, as it is written: The deliverer will come from Zion.", "theme": "Salvation"}
+    ],
+    "earthquake": [
+        {"reference": "Matthew 24:7", "text": "There will be famines and earthquakes in various places. All these are the beginning of birth pains.", "theme": "Signs of the Times"},
+        {"reference": "Revelation 16:18", "text": "Then there came flashes of lightning, rumblings, peals of thunder and a severe earthquake.", "theme": "End Times"},
+        {"reference": "Psalm 46:2-3", "text": "Therefore we will not fear, though the earth give way and the mountains fall into the heart of the sea.", "theme": "God's Sovereignty"}
+    ],
+    "famine": [
+        {"reference": "Matthew 24:7", "text": "Nation will rise against nation, and kingdom against kingdom. There will be famines and earthquakes in various places.", "theme": "End Times Signs"},
+        {"reference": "Revelation 6:5-6", "text": "When the Lamb opened the third seal, I heard the third living creature say, 'Come!' I looked, and there before me was a black horse!", "theme": "Four Horsemen"},
+        {"reference": "Amos 8:11", "text": "The days are coming, declares the Sovereign Lord, when I will send a famine through the land—not a famine of food or a thirst for water, but a famine of hearing the words of the Lord.", "theme": "Spiritual Famine"}
+    ],
+    "plague": [
+        {"reference": "Luke 21:11", "text": "There will be great earthquakes, famines and pestilences in various places, and fearful events and great signs from heaven.", "theme": "End Times"},
+        {"reference": "Revelation 6:8", "text": "I looked, and there before me was a pale horse! Its rider was named Death, and Hades was following close behind him.", "theme": "Judgment"},
+        {"reference": "Psalm 91:5-6", "text": "You will not fear the terror of night, nor the arrow that flies by day, nor the pestilence that stalks in the darkness.", "theme": "Divine Protection"}
+    ],
+    "economy": [
+        {"reference": "Revelation 13:17", "text": "So that they could not buy or sell unless they had the mark, which is the name of the beast or the number of its name.", "theme": "End Times Economy"},
+        {"reference": "Matthew 6:24", "text": "No one can serve two masters. Either you will hate the one and love the other. You cannot serve both God and money.", "theme": "Priorities"},
+        {"reference": "1 Timothy 6:10", "text": "For the love of money is a root of all kinds of evil. Some people, eager for money, have wandered from the faith.", "theme": "Warning"}
+    ],
+    "government": [
+        {"reference": "Romans 13:1", "text": "Let everyone be subject to the governing authorities, for there is no authority except that which God has established.", "theme": "Authority"},
+        {"reference": "Daniel 2:21", "text": "He changes times and seasons; he deposes kings and raises up others. He gives wisdom to the wise.", "theme": "God's Sovereignty"},
+        {"reference": "Proverbs 21:1", "text": "The king's heart is a stream of water in the hand of the Lord; he turns it wherever he will.", "theme": "Divine Control"}
+    ],
+    "persecution": [
+        {"reference": "Matthew 5:10-11", "text": "Blessed are those who are persecuted because of righteousness, for theirs is the kingdom of heaven.", "theme": "Beatitudes"},
+        {"reference": "2 Timothy 3:12", "text": "In fact, everyone who wants to live a godly life in Christ Jesus will be persecuted.", "theme": "Christian Life"},
+        {"reference": "Romans 8:35", "text": "Who shall separate us from the love of Christ? Shall trouble or hardship or persecution or famine or nakedness or danger or sword?", "theme": "God's Love"}
+    ],
+    "disaster": [
+        {"reference": "Romans 8:28", "text": "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.", "theme": "God's Plan"},
+        {"reference": "Psalm 46:1", "text": "God is our refuge and strength, an ever-present help in trouble.", "theme": "Divine Help"},
+        {"reference": "Isaiah 43:2", "text": "When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you.", "theme": "God's Presence"}
+    ],
+    "climate": [
+        {"reference": "Genesis 8:22", "text": "As long as the earth endures, seedtime and harvest, cold and heat, summer and winter, day and night will never cease.", "theme": "God's Promise"},
+        {"reference": "Revelation 16:8-9", "text": "The fourth angel poured out his bowl on the sun, and the sun was allowed to scorch people with fire.", "theme": "End Times"},
+        {"reference": "Colossians 1:16-17", "text": "For in him all things were created: things in heaven and on earth. He is before all things, and in him all things hold together.", "theme": "Christ's Sovereignty"}
+    ],
+    "election": [
+        {"reference": "Proverbs 29:2", "text": "When the righteous thrive, the people rejoice; when the wicked rule, the people groan.", "theme": "Leadership"},
+        {"reference": "1 Timothy 2:1-2", "text": "I urge that petitions, prayers, intercession and thanksgiving be made for all people—for kings and all those in authority.", "theme": "Prayer"},
+        {"reference": "Psalm 75:6-7", "text": "No one from the east or the west or from the desert can exalt themselves. It is God who judges: He brings one down, he exalts another.", "theme": "God's Sovereignty"}
+    ],
+    "violence": [
+        {"reference": "Genesis 6:11", "text": "Now the earth was corrupt in God's sight and was full of violence.", "theme": "Days of Noah"},
+        {"reference": "Matthew 24:37", "text": "As it was in the days of Noah, so it will be at the coming of the Son of Man.", "theme": "End Times"},
+        {"reference": "Psalm 11:5", "text": "The Lord examines the righteous, but the wicked, those who love violence, he hates with a passion.", "theme": "God's Justice"}
+    ],
+    "technology": [
+        {"reference": "Daniel 12:4", "text": "But you, Daniel, roll up and seal the words of the scroll until the time of the end. Many will go here and there to increase knowledge.", "theme": "End Times Knowledge"},
+        {"reference": "Revelation 13:16-17", "text": "It also forced all people, great and small, rich and poor, free and slave, to receive a mark on their right hands or on their foreheads.", "theme": "Mark of the Beast"},
+        {"reference": "Genesis 11:6", "text": "The Lord said, 'If as one people speaking the same language they have begun to do this, then nothing they plan to do will be impossible for them.'", "theme": "Human Capability"}
+    ],
+    "default": [
+        {"reference": "Jeremiah 29:11", "text": "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", "theme": "God's Plan"},
+        {"reference": "Romans 8:28", "text": "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.", "theme": "Divine Purpose"},
+        {"reference": "Proverbs 3:5-6", "text": "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", "theme": "Trust in God"}
+    ]
+}
+
+def find_relevant_scriptures(text: str) -> list:
+    """Find relevant scriptures based on keywords in the text"""
+    text_lower = text.lower()
+    found_scriptures = []
+    matched_keywords = set()
+    
+    for keyword, scriptures in SCRIPTURE_KEYWORDS.items():
+        if keyword != "default" and keyword in text_lower:
+            matched_keywords.add(keyword)
+            for scripture in scriptures:
+                if scripture["reference"] not in [s["reference"] for s in found_scriptures]:
+                    found_scriptures.append(scripture)
+    
+    # If no matches, use default
+    if not found_scriptures:
+        found_scriptures = SCRIPTURE_KEYWORDS["default"]
+    
+    # Limit to 4 scriptures
+    return found_scriptures[:4]
+
+@api_router.get("/news/scripture/{news_id}")
+async def get_news_scripture(news_id: str):
+    """Get relevant scriptures for a news story (no AI, instant)"""
+    # Find the news story
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    daily_news = await db.daily_news.find_one({"date": today}, {"_id": 0})
+    
+    if not daily_news:
+        raise HTTPException(status_code=404, detail="No daily news found")
+    
+    news_story = None
+    for story in daily_news.get("stories", []):
+        if story["news_id"] == news_id:
+            news_story = story
+            break
+    
+    if not news_story:
+        raise HTTPException(status_code=404, detail="News story not found")
+    
+    # Find relevant scriptures based on keywords
+    search_text = f"{news_story['title']} {news_story['description']} {news_story.get('category', '')}"
+    scriptures = find_relevant_scriptures(search_text)
+    
+    return {
+        "news_id": news_id,
+        "headline": news_story["title"],
+        "scriptures": scriptures
+    }
+
 # ==================== NEWS-SCRIPTURE ANALYSIS (PREMIUM) ====================
 
 @api_router.post("/analyze/news")
