@@ -18,9 +18,13 @@ const DictionaryPage = () => {
   const fetchDictionary = async () => {
     try {
       const response = await axios.get(`${API_URL}/bible/dictionary`);
-      setWords(response.data.words);
-      if (response.data.words.length > 0) {
-        setSelectedWord(response.data.words[0]);
+      // Sort words alphabetically
+      const sortedWords = [...response.data.words].sort((a, b) => 
+        a.word.toLowerCase().localeCompare(b.word.toLowerCase())
+      );
+      setWords(sortedWords);
+      if (sortedWords.length > 0) {
+        setSelectedWord(sortedWords[0]);
       }
     } catch (error) {
       console.error('Error fetching dictionary:', error);
