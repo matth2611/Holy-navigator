@@ -13,6 +13,10 @@ from datetime import datetime, timezone, timedelta
 import jwt
 import bcrypt
 import httpx
+import json
+from pywebpush import webpush, WebPushException
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -27,6 +31,9 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default_secret')
+VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY')
+VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY')
+VAPID_EMAIL = os.environ.get('VAPID_EMAIL', 'mailto:admin@holynavigator.com')
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
