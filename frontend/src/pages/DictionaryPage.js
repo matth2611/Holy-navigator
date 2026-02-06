@@ -47,10 +47,12 @@ const DictionaryPage = () => {
     }
   };
 
-  const filteredWords = words.filter(word =>
-    word.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    word.definition.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredWords = words
+    .filter(word =>
+      word.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      word.definition.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
 
   if (loading) {
     return (
