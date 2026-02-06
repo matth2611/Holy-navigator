@@ -118,6 +118,7 @@ const NewsAnalysisPage = () => {
 
     setAnalyzingNewsId(newsId);
     setResult(null);
+    setScriptureResult(null);
     setActiveTab('daily');
 
     try {
@@ -125,12 +126,29 @@ const NewsAnalysisPage = () => {
         headers: getAuthHeaders()
       });
       setResult(response.data);
-      toast.success('Analysis complete!');
+      toast.success('AI Analysis complete!');
     } catch (error) {
       console.error('Analysis error:', error);
       toast.error(error.response?.data?.detail || 'Analysis failed. Please try again.');
     } finally {
       setAnalyzingNewsId(null);
+    }
+  };
+
+  const getScripture = async (newsId) => {
+    setLoadingScriptureId(newsId);
+    setScriptureResult(null);
+    setResult(null);
+
+    try {
+      const response = await axios.get(`${API_URL}/news/scripture/${newsId}`);
+      setScriptureResult(response.data);
+      toast.success('Scriptures found!');
+    } catch (error) {
+      console.error('Scripture error:', error);
+      toast.error('Failed to find scriptures');
+    } finally {
+      setLoadingScriptureId(null);
     }
   };
 
