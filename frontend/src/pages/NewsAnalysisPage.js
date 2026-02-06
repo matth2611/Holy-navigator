@@ -323,12 +323,67 @@ const NewsAnalysisPage = () => {
                 {analyzingNewsId ? (
                   <div className="bg-card border border-border/40 rounded-2xl p-12 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C5A059] mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Finding scripture connections...</p>
+                    <p className="text-muted-foreground">AI is analyzing scripture connections...</p>
                     <p className="text-sm text-muted-foreground mt-2">This may take a moment</p>
+                  </div>
+                ) : loadingScriptureId ? (
+                  <div className="bg-card border border-border/40 rounded-2xl p-12 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C5A059] mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Finding relevant scriptures...</p>
+                  </div>
+                ) : scriptureResult ? (
+                  <div className="bg-card border border-border/40 rounded-2xl overflow-hidden sticky top-4" data-testid="scripture-result">
+                    <div className="bg-gradient-to-r from-[#0A2463] to-[#1a3a7a] text-white p-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BookOpen className="w-5 h-5 text-[#C5A059]" />
+                        <span className="text-sm font-medium text-white/70">Related Scripture</span>
+                      </div>
+                      <h3 className="font-serif text-xl font-bold">{scriptureResult.headline}</h3>
+                    </div>
+                    
+                    <div className="p-6 space-y-4 max-h-[500px] overflow-y-auto">
+                      {scriptureResult.scriptures?.map((scripture, index) => (
+                        <div key={index} className="bg-muted/30 rounded-xl p-4 border-l-4 border-[#C5A059]">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-semibold text-[#0A2463] dark:text-[#C5A059]">
+                              {scripture.reference}
+                            </span>
+                            <span className="text-xs px-2 py-1 bg-[#C5A059]/10 text-[#C5A059] rounded-full">
+                              {scripture.theme}
+                            </span>
+                          </div>
+                          <p className="font-serif italic text-foreground/80">
+                            "{scripture.text}"
+                          </p>
+                        </div>
+                      ))}
+                      
+                      <div className="mt-4 pt-4 border-t border-border/40">
+                        <p className="text-sm text-muted-foreground text-center">
+                          Want deeper AI-powered analysis?
+                        </p>
+                        <Button
+                          onClick={() => {
+                            const newsItem = dailyNews.find(n => n.news_id === scriptureResult.news_id);
+                            if (newsItem) analyzeNewsStory(newsItem.news_id);
+                          }}
+                          disabled={!isPremium}
+                          className="w-full mt-2 btn-primary"
+                        >
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Get AI Analysis
+                          {!isPremium && <span className="ml-2 text-xs opacity-70">(Premium)</span>}
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 ) : result ? (
                   <div className="bg-card border border-border/40 rounded-2xl overflow-hidden sticky top-4" data-testid="analysis-result">
                     <div className="hero-gradient text-white p-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-5 h-5 text-[#C5A059]" />
+                        <span className="text-sm font-medium text-white/70">AI Analysis</span>
+                      </div>
                       <h3 className="font-serif text-xl font-bold">{result.news_headline}</h3>
                       {result.news_source && (
                         <p className="text-white/70 text-sm mt-1">Source: {result.news_source}</p>
