@@ -252,15 +252,23 @@ const NewsAnalysisPage = () => {
                             )}
                           </Button>
                           
-                          <a
-                            href={news.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
-                          >
-                            <ExternalLink className="w-3 h-3 mr-1" />
-                            Read Full
-                          </a>
+                          {news.link && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                              className="text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              <a
+                                href={news.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <ExternalLink className="w-3 h-3 mr-1" />
+                                Source Article
+                              </a>
+                            </Button>
+                          )}
                         </div>
                       </div>
                     ))}
