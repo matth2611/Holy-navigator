@@ -59,8 +59,7 @@ export const AuthProvider = ({ children }) => {
 
   const processOAuthSession = async (sessionId) => {
     const response = await axios.post(`${API_URL}/auth/session`, 
-      { session_id: sessionId },
-      { withCredentials: true }
+      { session_id: sessionId }
     );
     const { token: newToken, ...userData } = response.data;
     localStorage.setItem('token', newToken);
